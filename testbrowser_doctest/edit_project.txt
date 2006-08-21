@@ -1,0 +1,16 @@
+>>> from metadata import *
+>>> import login, logout
+>>> browser = login.login(user, password)
+>>> browser.getLink('Projects').click()
+>>> browser.getLink(projname).click()
+>>> browser.getLink('Edit').click()
+>>> browser.getControl(name="title").value = projtitle
+>>> browser.getControl(name="description").value = projdesc
+>>> browser.getControl(name="text").value = projbody
+>>> browser.getControl(name="cmfeditions_version_comment").value = projver
+>>> browser.getControl(name="form_submit").click()
+>>> 'Changes saved.' in browser.contents
+True
+>>> projtitle in browser.contents
+True
+>>> logout.logout(browser)
