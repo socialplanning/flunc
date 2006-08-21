@@ -1,0 +1,16 @@
+>>> from metadata import *
+>>> import login, logout
+>>> browser = login.login(user, password)
+>>> home()
+>>> browser.getLink('Start a Project').click()
+>>> browser.getControl(name='title').value = projname
+>>> browser.getControl(name='full_name').value = projfullname
+>>> browser.getControl(name='workflow_policy').value = ['open_policy']
+>>> browser.getControl(name='form_submit').click()
+>>> browser.contents
+'...This is the home page for your project...'
+>>> "tester's test project" in browser.contents
+True
+>>> projname in browser.url
+True
+>>> logout.logout(browser)
