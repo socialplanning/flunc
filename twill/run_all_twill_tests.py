@@ -1,0 +1,4 @@
+import twill_utils
+from twill_openplans_suite import twillFiles as openPlansTwillSuite
+
+twill_utils.executeTwillScriptsInSession(openPlansTwillSuite)

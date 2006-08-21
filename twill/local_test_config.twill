@@ -1,0 +1,10 @@
+setglobal baseURL   http://localhost:8080/foo
+setglobal user      tester 
+setglobal fullname  'John Q. Tester' 
+setglobal password  'tester1'
+setglobal email     'test@test.test'
+setglobal projname  'testhaven' 
+setglobal projtitle 'testing home'
+setglobal projdesc  'a test project' 
+setglobal projbody  'a body text' 
+setglobal projver   'the first version'

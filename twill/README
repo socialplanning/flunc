@@ -1,0 +1,29 @@
+This is a small collection of twill scripts that run against OpenPlans. 
+These were tested using twill-0.8.5 (http://twill.idyll.org)
+
+These are set up to be run as unit tests under the OpenPlans Product 
+by the zope test runner against an instance configured in  
+local_test_config.twill 
+
+These may also be executed by running:  
+python run_all_twill_tests.py
+
+to fiddle with them individually: 
+python twill-utils.py local_test_config.twill [some_invidual_test.twill] [some_other_test.twill] ... 
+
+these tests depend on each other, and run as a suite, though they can be 
+somewhat individually run. 
+
+The defined suite order is: 
+
+local_test_config.twill   (should always be first to define the configuration variables) 
+test_create_user.twill    (needs to be run once before test_login_form.twill will work)
+test_login_form.twill     (needs to be run next to establish a login for the other tests)
+test_create_project.twill (needs to be run once before test_edit_project.twill will work)
+test_edit_project.twill 
+test_logout.twill
+
+
+no cleanup is done, so unless these are run against a fixture that disappears after the 
+test, don't expect to be able to create a user or a project successfully in the same 
+instance twice. 

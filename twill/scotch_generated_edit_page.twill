@@ -1,0 +1,224 @@
+# record 0
+go http://localhost:8080/foo
+
+# record 2
+#   referer = http://localhost:8080/foo
+
+# record 3
+#   referer = http://localhost:8080/foo
+
+# record 4
+#   referer = http://localhost:8080/foo
+
+# record 5
+#   referer = http://localhost:8080/foo
+
+# record 6
+#   referer = http://localhost:8080/foo
+
+# record 10
+#   referer = http://localhost:8080/foo
+
+# record 11
+#   referer = http://localhost:8080/foo
+go http://localhost:8080/foo/login_form
+
+# record 13
+#   referer = http://localhost:8080/foo/login_form
+
+# record 14
+#   referer = http://localhost:8080/foo/login_form
+
+# record 15
+#   referer = http://localhost:8080/foo/login_form
+
+# record 16
+#   referer = http://localhost:8080/foo/login_form
+
+# record 17
+#   referer = http://localhost:8080/foo/login_form
+
+# record 18
+#   referer = http://localhost:8080/foo/login_form
+
+# record 19
+#   referer = http://localhost:8080/foo/login_form
+fv 1 submit 'Log in'
+fv 1 form.submitted '1'
+fv 1 __ac_name 'testuser'
+fv 1 __ac_password 'foobar'
+fv 1 js_enabled '0'
+fv 1 came_from 'http://localhost:8080/foo'
+fv 1 pwd_empty '0'
+submit
+
+# record 20
+#   referer = http://localhost:8080/foo/login_form
+
+# record 21
+#   referer = http://localhost:8080/foo/login_form
+
+# record 22
+#   referer = http://localhost:8080/foo/login_form
+
+# record 23
+#   referer = http://localhost:8080/foo/login_form
+
+# record 24
+#   referer = http://localhost:8080/foo/login_form
+
+# record 25
+#   referer = http://localhost:8080/foo/login_form
+
+# record 26
+#   referer = http://localhost:8080/foo/login_form
+
+# record 27
+#   referer = http://localhost:8080/foo/login_form
+
+# record 28
+#   referer = http://localhost:8080/foo/login_form
+
+# record 29
+#   referer = http://localhost:8080/foo/login_form
+go http://localhost:8080/foo/projects
+
+# record 30
+#   referer = http://localhost:8080/foo/projects
+
+# record 31
+#   referer = http://localhost:8080/foo/projects
+
+# record 32
+#   referer = http://localhost:8080/foo/projects
+
+# record 33
+#   referer = http://localhost:8080/foo/projects
+
+# record 34
+#   referer = http://localhost:8080/foo/projects
+
+# record 35
+#   referer = http://localhost:8080/foo/projects
+
+# record 36
+#   referer = http://localhost:8080/foo/projects
+
+# record 37
+#   referer = http://localhost:8080/foo/projects
+
+# record 38
+#   referer = http://localhost:8080/foo/projects
+
+# record 39
+#   referer = http://localhost:8080/foo/projects
+go http://localhost:8080/foo/projects/wuzzle/
+
+# record 41
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 42
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 43
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 44
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 45
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 46
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 47
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 48
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 49
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+
+# record 50
+#   referer = http://localhost:8080/foo/projects/wuzzle/
+go http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 51
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 52
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 53
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 54
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 55
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 56
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 57
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 58
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 60
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+
+# record 61
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/edit
+fv 1 add_reference.field:record ''
+fv 1 description_text_format 'text/plain'
+fv 1 add_reference.destination:record ''
+fv 1 text_file ''
+fv 1 fieldset 'default'
+fv 1 description ''
+fv 1 last_referer 'http://localhost:8080/foo/projects/wuzzle/'
+fv 1 title 'Wuzzle World Headquarters'
+fv 1 text 'Tomato Soup'
+fv 1 attachmentFile ''
+fv 1 add_reference.type:record ''
+fv 1 text_text_format 'text/plain'
+fv 1 form_submit 'Save'
+fv 1 cmfeditions_version_comment ''
+fv 1 attachmentTitle ''
+fv 1 displayAttachments '1'
+fv 1 form.submitted '1'
+fv 1 id 'project-home'
+fv 1 displayAttachments_visible 'on'
+submit
+
+# record 63
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 64
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 65
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 66
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 67
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 68
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 69
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 70
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
+# record 71
+#   referer = http://localhost:8080/foo/projects/wuzzle/project-home/?portal_status_message=Changes%20saved.
+
