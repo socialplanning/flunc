@@ -5,14 +5,14 @@ from Testing.ZopeTestCase import FunctionalDocFileSuite, FunctionalTestCase
 optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
 def test_suite():
     tests = []
-    testfiles = ('login.txt',
-                 'create_project.txt',
-                 'edit_project.txt',
+
+    # testfiles should be ordered
+    testfiles = ('create_user.txt',
                  'login.txt',
-                 'create_user.txt')
-    
+                 'create_project.txt',
+                 'edit_project.txt')
+
     for name in testfiles:
-        #doctest.DocFileSuite
         tests.append(FunctionalDocFileSuite(name,
                                             optionflags=optionflags,
                                             package='Products.testbrowser_doctest',
