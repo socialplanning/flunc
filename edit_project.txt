@@ -1,4 +1,4 @@
->>> from metadata import *
+>>> from Products.testbrowser_doctest.metadata import *
 >>> import login, logout
 >>> browser = login.login(user, password)
 >>> browser.getLink('Projects').click()
