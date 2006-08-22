@@ -1,5 +1,6 @@
->>> from metadata import *
->>> import login, logout
+>>> from Products.testbrowser_doctest.metadata import *
+>>> # from Products.testbrowser_doctest.login import login
+>>> # from Products.testbrowser_doctest.logout import logout
 >>> browser = login.login(user, password)
 >>> browser.getLink('Projects').click()
 >>> browser.getLink(projname).click()

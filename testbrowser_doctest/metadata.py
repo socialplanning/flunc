@@ -30,3 +30,5 @@ baseURL=server + baseURL
 
 def home():
     browser.open(baseURL)
+
+import login, logout
