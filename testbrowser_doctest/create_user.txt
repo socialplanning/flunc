@@ -1,4 +1,4 @@
->>> from metadata import *
+>>> from Products.testbrowser_doctest.metadata import *
 >>> home()
 >>> 'OpenPlans Home' in browser.contents
 True
