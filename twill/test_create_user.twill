@@ -6,5 +6,4 @@ fv edit_form email $email
 fv edit_form password $password
 fv edit_form confirm_password $password
 submit form.button.register
-show
 find "You have been registered"
