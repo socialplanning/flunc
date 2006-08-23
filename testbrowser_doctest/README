@@ -1,0 +1,10 @@
+Since each test invokes a new browser instance, the logout test was bundled 
+with the login test. The tests still need to be invoked in order, however, 
+since the site may only contain one user and project of the same name and 
+there is no internal framework to delete these data without the Zope framework
+
+login
+create_user
+create_project
+edit_project
+logout 
