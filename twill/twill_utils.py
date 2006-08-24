@@ -2,10 +2,13 @@ import sys
 import twill
 from twill.namespaces import get_twill_glocals
 
-def executeTwillScriptsInSession(twillFiles): 
+def executeTwillScriptsInSession(twillFiles,varDefs={}): 
   """ run a list of twill scripts in a single 
       session.
   """ 
+
+  defineTwillVars(varDefs)
+
   for testFile in twillFiles: 
     twill.execute_file(testFile,no_reset=1)
 
@@ -15,7 +18,7 @@ def defineTwillVars(varDict):
      use in twill scripts
   """
   twillGlobals,twillLocals = get_twill_glocals()
-  twillLocals.update(varDict)
+  twillGlobals.update(varDict)
 
 
 if __name__ == '__main__':
