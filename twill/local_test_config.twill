@@ -1,4 +1,5 @@
-setglobal baseURL   http://localhost:8080/foo
+# set this to force external testing 
+#setglobal baseURL   http://localhost:8080/foo
 setglobal user      tester 
 setglobal fullname  'John Q. Tester' 
 setglobal password  'tester1'

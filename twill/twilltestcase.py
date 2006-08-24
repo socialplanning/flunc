@@ -1,30 +1,38 @@
 import unittest 
 import twill
+from twill.namespaces import get_twill_glocals
 
-class TwillTestCase(unittest.TestCase): 
-  """Test case which runs an individual 
-     twill script. 
-  """ 
+from Products.OpenPlans.tests.openplanstestcase import OpenPlansTestCase
+from Testing.ZopeTestCase.utils import startZServer
 
-  def __init__(self,fileName,resetTwill): 
-    """init a TwillTestCase. fileName is the 
-       name of the file containing the twill 
-       script. if resetTwill is set to True the 
-       test will be run in a new browser session
+
+class FunctionalMultiTwillTest(OpenPlansTestCase): 
     """ 
-    unittest.TestCase.__init__(self,"runTest")
-    self.twillScript = fileName
-    self.resetTwill = resetTwill
+    runs a series of twill script tests against a Fixture instance 
+    of Open Plans.  
+    """ 
 
-  def runTest(self): 
-    try: 
-      print "Executing", self.twillScript 
-      if self.resetTwill: 
-        twill.execute_file(self.twillScript)
-      else: 
-        twill.execute_file(self.twillScript,no_reset=1)
-    except Exception: 
-      self.fail("Twill test " + self.twillScript + " failed")
+    def __init__(self,twillFiles): 
+        unittest.TestCase.__init__(self,"runTest")
+        self.twillFiles = twillFiles
+
+    def afterSetUp(self): 
+        OpenPlansTestCase.afterSetUp(self)
+        # make the fixture accessible via http
+        serverAddr = startZServer()
+
+        # record where it is 
+        self.openPlansURL = "http://%s:%s/%s" % (serverAddr[0],serverAddr[1],self.portal.getId())
+    
+    def runTest(self):
+        
+        # let twill scripts know where the instance is 
+	twill_globals,twill_locals = get_twill_glocals()
+        twill_globals['baseURL'] = self.openPlansURL
+
+        for twillFile in self.twillFiles: 
+            print "Executing twill script: ", twillFile
+            twill.execute_file(twillFile,no_reset=1)
 
 
 def makeTwillSuite(twillScripts): 
@@ -32,8 +40,7 @@ def makeTwillSuite(twillScripts):
      twill scripts contained in the files given 
      by file name in the list twillScripts in 
      the order given by the list 
-  """ 
+  """   
   twillSuite = unittest.TestSuite()
-  for fileName in twillScripts: 
-    twillSuite.addTest(TwillTestCase(fileName,resetTwill=False))
+  twillSuite.addTest(FunctionalMultiTwillTest(twillScripts))
   return twillSuite
