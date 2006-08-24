@@ -5,7 +5,7 @@ suite = unittest.TestSuite()
 def test_suite():
     print __file__
     dirname = os.path.dirname(__file__)
-    prodstring = "Products.testbrowser_doctest."
+    prodstring = "Products.testbrowser_unittest."
     if not len(dirname):
         dirname = '.'
         prodstring = ''
@@ -17,8 +17,7 @@ def test_suite():
 
     for test in tests:
         Products = __import__(prodstring + test[:-3])
-        print Products
-        testmodule = getattr(Products.testbrowser_doctest, test[:-3])
+        testmodule = getattr(Products.testbrowser_unittest, test[:-3])
         if hasattr(testmodule, 'test_suite'):
             suite.addTest(testmodule.test_suite())
     return suite
