@@ -8,11 +8,14 @@ from Testing.ZopeTestCase.utils import startZServer
 
 class FunctionalMultiTwillTest(OpenPlansTestCase): 
     """ 
-    runs a series of twill script tests against a Fixture instance 
-    of Open Plans.  
+    runs a series of twill script tests in order 
+    against a Fixture instance of Open Plans.  
     """ 
 
     def __init__(self,twillFiles): 
+        """ 
+        twillFiles - list of absolute file names to the scripts to run 
+        """ 
         unittest.TestCase.__init__(self,"runTest")
         self.twillFiles = twillFiles
 

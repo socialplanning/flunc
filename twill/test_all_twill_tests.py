@@ -2,7 +2,6 @@ import os,sys
 import twilltestcase
 from twill_openplans_suite import twillFiles as openPlansTwillSuite
 from Globals import package_home
-from config import GLOBALS 
 
 if __name__ == '__main__': 
   execfile(os.path.join(sys.path[0],'framework.py'))
@@ -10,7 +9,8 @@ if __name__ == '__main__':
 
 def test_suite():
 
-  basePath = package_home(GLOBALS)
+  # find where we are
+  basePath = package_home(globals())
 
   allTwillTests = [ os.path.sep.join([basePath,filename]) \
                       for filename in openPlansTwillSuite ]
