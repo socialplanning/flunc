@@ -9,14 +9,17 @@ tests should be runnable by executing:
 zopectl test -s Products.OpenPlans_twill_tests
 
 These are set up to be run by the zope test runner against a fixture 
-instance created ad hoc for the the tests. local_test_config.twill 
-can be altered to force running against a particular instance. 
+instance created ad hoc for the the tests. The test harness provides 
+the twill variable $baseURL to scripts which refers to the root of the 
+open plans site. local_test_config.twill can be altered to override this 
+and force running against a particular instance. 
 
 These may also be executed by running:  
 python run_all_twill_tests.py <url to openplans site>
 
 these tests depend on each other, and run as a suite, though they can be 
-somewhat individually run. 
+somewhat individually run. Which tests are run and in what order is 
+determined by the list in twill_openplans_suite.py 
 
 The defined suite order is: 
 
@@ -31,3 +34,5 @@ test_logout.twill
 no automatic cleanup is done when this is run outside of the zope testing framework. 
 don't expect to be able to create a user or a project successfully in the same 
 instance twice.  (there is a cleanup script in testbrowser_doctest)
+
+
