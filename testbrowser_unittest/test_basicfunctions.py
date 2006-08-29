@@ -8,23 +8,46 @@ testfiles = ('op_create_user',
              'op_create_project',
              'op_edit_project')
 
-if useFiveTB:
+if inzopectl:  ### if running in zopectl...
+    from Products.OpenPlans.tests.openplanstestcase import OpenPlansTestCase
+    from Testing.ZopeTestCase.utils import startZServer
+    
     class TestBasicFunctions(OpenPlansTestCase):
         'example class for basic tests'
-        
-        def test_dummy(self):
-            print 'hi'
-            print self.portal.absolute_url()
-            browser.open('http://localhost')
-#            browser.open(self.portal.absolute_url())
 
-#            print browser.contents
+        def afterSetUp(self):
+            OpenPlansTestCase.afterSetUp(self)
+
+            # make the fixture accessible via http
+            serverAddr = startZServer()
+
+            # record where it is 
+            server = "http://%s:%s" % (serverAddr[0],serverAddr[1])
+            portalURL = "/%s" % (self.portal.getId())
+            get_baseURL(server + portalURL)
+            
+
+        def test_run(self):
+            ' run the tests '
+            for name in testfiles:
+                Products = __import__("Products.testbrowser_unittest." + name)
+                testmodule = getattr(Products.testbrowser_unittest, name)
+                theresult = unittest.TestResult()
+                testmodule.test_suite().run(theresult)
+
+                # check for errors/failures
+                if len(theresult.errors):
+                    print theresult.errors
+                if len(theresult.failures):
+                    print theresult.failures
+                assert theresult.wasSuccessful()                
 
     def test_suite():
         print "OpenPlans test:  fivetb"
-        suite = unittest.makeSuite(TestBasicFunctions, 'test')
+        suite = unittest.TestSuite(unittest.makeSuite(TestBasicFunctions))
+
         return suite
-else:
+else: ### if not running w/in zopectl
 
     def test_suite():
         tests = unittest.TestSuite()

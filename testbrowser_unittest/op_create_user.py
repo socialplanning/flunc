@@ -11,7 +11,7 @@ class TestCreateUser(unittest.TestCase):
         assert 'OpenPlans Home' in browser.contents
 
         browser.getLink('Join').click()
-        assert browser.url == baseURL + '/createMember'
+        assert browser.url == get_baseURL() + '/createMember'
 
         browser.getControl(name='id').value = user
         browser.getControl(name='fullname').value = fullname
