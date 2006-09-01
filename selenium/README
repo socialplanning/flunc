@@ -34,4 +34,5 @@ test_tal_logout.html
 
 3) Add 'configuration.py' as a 'Script(Python)' object using the ID 'config'
 
-4) Go to the url of te Zuite object and run the tests!
+4) Go to the url of te Zuite object and run the tests! [Note that you must run 
+these not as the zope manager but as another user/profile.]
