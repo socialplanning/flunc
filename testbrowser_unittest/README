@@ -1,0 +1,20 @@
+testbrowser_unittest
+====================
+
+This is a sample test suite for the OpenCore software
+(http://www.openplans.org/projects/opencore/).
+The tests use the unittest framework.
+This directory should be copied to or linked to from
+the zope $INSTANCE_HOME/Products . Tests may then be run with 
+
+zopectl test -s Products.testbrowser_unittest
+
+This test suite does not use the Five testbrowser currently (the
+useFiveTB flag has zero functionality).  The flag 'inzopectl' controls
+whether the tests are run against a static fixture defined in
+configuration.py (if inzopectl is False) or if it creates and runs its
+tests against a new fixture (if inzopectl is True).
+
+The tests may be cleaned up by running:
+
+python cleanup.py
