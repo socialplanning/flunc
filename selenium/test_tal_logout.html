@@ -1,41 +1,31 @@
-<html>
+<html tal:define="server root/absolute_url; portal container/config; baseURL string:$server$portal">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>login</title>
+<title>logout</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">login</td></tr>
+<tr><td rowspan="1" colspan="3">logout</td></tr>
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>http://localhost:8080/openplans_copy/</td>
-	<td>&nbsp;</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Log in</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>__ac_name</td>
-	<td>tester</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>__ac_password</td>
-	<td>tester1</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>submit</td>
+	<td tal:content="string:$baseURL">http://localhost:8080/openplans_copy</td>
 	<td></td>
 </tr>
 <tr>
 	<td>assertTextPresent</td>
-	<td>You are now logged in</td>
+	<td>tester</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Log out</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>You are now logged out</td>
 	<td></td>
 </tr>
 </tbody></table>
