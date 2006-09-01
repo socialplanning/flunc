@@ -1,4 +1,4 @@
-<html>
+<html tal:define="server root/absolute_url; portal container/config; baseURL string:$server$portal">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>edit_project</title>
@@ -10,7 +10,7 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>http://localhost:8080/openplans_copy/</td>
+	<td tal:content="string:$baseURL">http://localhost:8080/openplans_copy/</td>
 	<td></td>
 </tr>
 <tr>
@@ -59,12 +59,12 @@
 	<td></td>
 </tr>
 <tr>
-        <td>waitForTextPresent</td>
+        <td>assertTextPresent</td>
         <td>Changes saved.</td>
         <td></td>
 </tr>
 <tr>
-        <td>waitForTextPresent</td>
+        <td>assertTextPresent</td>
         <td>testing home</td>
         <td></td>
 </tr>
