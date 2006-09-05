@@ -20,6 +20,8 @@ these and other html table files via the python interface to Selenium RC.
 This directory can be linked into the Zope Products directory as 
 OpenPlans_selenium_tests and run through the zope testrunner via
 zopectl test -s Products.OpenPlans_selenium_tests 
+This utilizes the selenium remote control package from 
+OpenQA (http://www.openqa.org) 
 
 The 'test_tal*' files are for Zelenium only and use TAL and the 
 simple script 'configuration.py'.
