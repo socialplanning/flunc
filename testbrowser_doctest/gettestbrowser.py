@@ -1,9 +1,16 @@
 import Products
 
+
 def gettestbrowser(Fivetb=False):
-    if Fivetb:
-        from Products.Five.testbrowser import Browser
-    else:
-        from zope.testbrowser.browser import Browser
-    browser = Browser()
-    return browser
+    global _browserSingleton
+
+    try:
+        type(_browserSingleton)
+    except NameError:
+        if Fivetb:
+            from Products.Five.testbrowser import Browser
+        else:
+            from zope.testbrowser.browser import Browser
+        _browserSingleton = Browser()
+        
+    return _browserSingleton

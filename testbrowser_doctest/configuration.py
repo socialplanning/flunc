@@ -1,17 +1,19 @@
-inzopectl = False  # boolean flag:  is being run from `zopectl test`?
-useFiveTB = False  # boolean flag:  use Five.testbrowser?
+inzopectl = True  # boolean flag:  is being run from `zopectl test`?
+useFiveTB = True  # boolean flag:  use Five.testbrowser?
 
-# this is the address of the instance of zope you are testing
-server='http://localhost:8080'
+# this is the address of the instance of zope you are testing if
+# you are not connecting to a fixture 
+_server='http://localhost:8080'
 
 # this is the path to the open plans object you are testing
-portalURL = '/openplans'
+_portalURL = '/foo'
 
-baseURL=server + portalURL
+# this should be accessed via get_baseURL()
+_baseURL= _server + _portalURL
 
 # user with rights to perform test cleanup (an admin)
-cleanup_user = 'admin_username'
-cleanup_password = 'admin_password'
+cleanup_user = 'ltucker'
+cleanup_password = 'joop'
 
 # info about for user that is created by the tests
 user='tester'
