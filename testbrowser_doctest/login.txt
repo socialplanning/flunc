@@ -1,9 +1,9 @@
 >>> from Products.testbrowser_doctest.metadata import *
 >>> # from Products.testbrowser_doctest.login import login
 >>> # from Products.testbrowser_doctest.logout import logout
->>> browser = login.login(user, password)
+>>> browser = login(user, password)
 >>> browser.contents
 '...You are now logged in...'
->>> logout.logout(browser)
+>>> logout(browser)
 >>> browser.contents
 '...You are now logged out...'
