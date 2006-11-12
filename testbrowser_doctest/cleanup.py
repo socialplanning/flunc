@@ -4,7 +4,7 @@ import urllib
 import configuration
 
 def cleanupTestProducts(): 
-    scheme,uri = urllib.splittype(configuration._baseURL) 
+    scheme,uri = urllib.splittype(configuration.baseURL) 
     host,path = urllib.splithost(uri)
     authURL = "%s://%s:%s@%s%s" % (scheme,configuration.cleanup_user,configuration.cleanup_password,host,path)
     portal = XMLRPCServer(authURL)

@@ -3,7 +3,7 @@
 >>> 'OpenPlans Home' in browser.contents
 True
 >>> browser.getLink('Join').click()
->>> browser.url == get_baseURL() + '/createMember'
+>>> browser.url == baseURL + '/createMember'
 True
 >>> browser.getControl(name='id').value = user
 >>> browser.getControl(name='fullname').value = fullname
@@ -13,9 +13,3 @@ True
 >>> browser.getControl(name='form.button.register').click()
 >>> 'You have been registered' in browser.contents
 True
->>> browser = login(user, password)
->>> browser.contents
-'...You are now logged in...'
->>> logout(browser)
->>> browser.contents
-'...You are now logged out...'

@@ -1,10 +1,9 @@
 """ metadata for OpenCore tests """
 
-import configuration
 from configuration import *
-from gettestbrowser import gettestbrowser
 
-browser = gettestbrowser(configuration.useFiveTB)
+from gettestbrowser import gettestbrowser
+browser = gettestbrowser(useFiveTB)
 
 def get_baseURL(set=''):
     global local_baseURL
@@ -15,22 +14,18 @@ def get_baseURL(set=''):
     try:
         type(local_baseURL)
     except NameError:
-        local_baseURL = configuration._baseURL
+        local_baseURL = baseURL
     
     return local_baseURL
 
 def home():
-    browser.open(get_baseURL())
+    global inzopectl, server, portalURL, baseURL
+    if useFiveTB:
+        from Products.OpenPlans.tests.openplanstestcase import *
+        print OpenPlansTestCase.portal.absolute_url()
+        browser.open(OpenPlansTestCase.portal.absolute_url())
+    else:
+        # print 'home:', get_baseURL()
+        browser.open(get_baseURL())
 
-def login(name, password):
-    home()
-    browser.getLink('Log in').click()
-    browser.getControl(name='__ac_name').value = name
-    browser.getControl(name='__ac_password').value = password
-    browser.getControl(name='submit').click()
-    return browser
-
-def logout(browser):
-    home()
-    browser.getLink('Log out').click()
-
+import login, logout
