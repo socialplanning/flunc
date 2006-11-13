@@ -1,0 +1,4 @@
+extend_with zope_cleanup
+
+zope_delobject 'projects' $projname
+zope_delobject 'portal_teams' $projname

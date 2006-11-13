@@ -1,0 +1,5 @@
+extend_with zope_cleanup
+
+setglobal admin 'admin'
+setglobal adminpw 'admin'
+zope_delobject 'portal_memberdata' 'tester'

@@ -3,3 +3,5 @@ login
 create_project
 edit_project
 logout
+destroy_project
+destroy_user
