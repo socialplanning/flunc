@@ -1,25 +1,34 @@
-python ./ftest.py --help for details 
+
+you should be able to setup.py develop into a working env, 
+after that: 
 
 
-try: 
+ftest --help for details 
 
-python ./ftest.py all 
 
-(runs all tests listed in all.tsuite against localhost:8080/portal) 
+by default ftest will search ./ftests/ to find tests. you can 
+change this with the -p (--path) option 
+
+
+ftest all 
+
+[runs all tests listed in all.tsuite against localhost:8080/portal]
+
+ftest -t http://localhost:8080/some_portal all 
+[runs all tests listed in all.tsuite against localhost:8080/some_portal]
 
 or 
 
-python ./ftest.py -t http://localhost:8080/p -c all create_user
+ftest -t http://localhost:8080/p -c all create_user
 
 (runs create_user.twill using all.conf) 
 
 or 
 
-python ./ftest.py -c all create_user create_project destroy_project destroy_user
+ftest -c all create_user create_project destroy_project destroy_user
 
 (specify an ad hoc suite creating and tearing down a user and project
  on default host) 
-
 
 
 individual tests are contained in 
