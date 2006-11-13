@@ -3,5 +3,4 @@ follow "Start a Project"
 fv add_form title $projname
 fv add_form full_name $projfullname
 submit form_submit
-save_html /home/ltucker/page.html
 find "Project Preferences"
