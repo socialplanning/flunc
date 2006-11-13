@@ -13,6 +13,13 @@ python ./ftest.py -t http://localhost:8080/p -c all create_user
 
 (runs create_user.twill using all.conf) 
 
+or 
+
+python ./ftest.py -c all create_user create_project destroy_project destroy_user
+
+(specify an ad hoc suite creating and tearing down a user and project
+ on default host) 
+
 
 
 individual tests are contained in 
