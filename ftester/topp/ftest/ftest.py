@@ -9,7 +9,7 @@ CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
 TEST               = '.twill' 
 CONFIG_OVERRIDES   = None
-
+options = {}
 
 def define_twill_vars(**kwargs): 
     tglobals, tlocals = get_twill_glocals()
@@ -23,9 +23,9 @@ def die(message, parser=None):
     sys.exit(0)
 
 def find_file_type(name, ext): 
-    filename = name + ext
+    filename = os.path.join(options.search_path, name + ext)
     if not os.path.isfile(filename):
-        raise IOError("unable to locate '%s'" % name + ext)
+        raise IOError("unable to locate '%s'" % filename)
     return filename 
 
 def find_configuration(name): 
@@ -90,19 +90,28 @@ def run_test(name):
         do_overrides()
         run_script(test_file)
     except IOError: 
-        raise IOError("unable to locate '%s' or '%s'" % (name + SUITE, 
-                                                         name + TEST)) 
+        raise IOError("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
+                                                               name + TEST, 
+                                                               options.search_path)) 
 
 def main(argv=None):
+    if argv is None:
+        argv = sys.argv
+
     parser = optparse.OptionParser()
-    parser.add_option('-t','--host',
+    parser.add_option('-t', '--host',
                       help='specifies the base url of the portal to test',
-                      dest='baseURL', 
+                      dest='baseURL',
                       default='http://localhost:8080/portal')
-    parser.add_option('-c','--config',
+    parser.add_option('-c', '--config',
                       help='specifies file with configuration overrides',
                       dest='config_file')
+    parser.add_option('-p', '--path',
+                      dest='search_path',
+                      default='ftests', 
+                      help='specifies location to search for tests')
     
+    global options 
     options, args = parser.parse_args(argv)
 
     if len(args) < 2: 
