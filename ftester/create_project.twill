@@ -1,0 +1,6 @@
+go ${baseURL}
+follow "Start a Project"
+fv add_form title $projname
+fv add_form full_name $projfullname
+submit form_submit
+find "Project Preferences"
