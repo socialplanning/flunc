@@ -3,13 +3,13 @@ python ./ftest.py --help for details
 
 try: 
 
-python ./ftest.py -t http://localhost:8080/p all 
+python ./ftest.py all 
 
-(runs all tests listed in all.tsuite) 
+(runs all tests listed in all.tsuite against localhost:8080/portal) 
 
 or 
 
-python ./ftest.py -c all create_user
+python ./ftest.py -t http://localhost:8080/p -c all create_user
 
 (runs create_user.twill using all.conf) 
 
