@@ -15,47 +15,37 @@ def define_twill_vars(**kwargs):
     tglobals, tlocals = get_twill_glocals()
     tglobals.update(kwargs)
 
-
 def die(message, parser=None): 
     print message 
     if parser is not None:
         parser.print_usage()
     sys.exit(0)
 
-def find_file_type(name, ext): 
+def read_file_type(name, ext): 
     filename = os.path.join(options.search_path, name + ext)
-    if not os.path.isfile(filename):
-        raise IOError("unable to locate '%s'" % filename)
-    return filename 
+    return open(filename).read()
 
-def find_configuration(name): 
-    return find_file_type(name, CONFIGURATION)
+def read_configuration(name): 
+    return read_file_type(name, CONFIGURATION)
 
-def find_suite(name): 
-    return find_file_type(name, SUITE)
+def read_suite(name): 
+    return read_file_type(name, SUITE)
 
-def find_test(name): 
-    return find_file_type(name, TEST)
+def read_test(name): 
+    return read_file_type(name, TEST)
 
-
-def parse_suite(filename): 
-    all_lines = open(filename).readlines()
-    
-    test_lines = []
-    for line in all_lines: 
-        line = line.strip()
-        if line and not line.startswith('#'):
-            test_lines.append(line)
-    return test_lines
+def parse_suite(suite_data): 
+    valid_line = lambda line: line.strip() and\
+                              not line.lstrip().startswith('#')
+    file_names = filter(valid_line, suite_data.splitlines())
+    return '\n'.join(map(read_test, file_names))
 
 def do_overrides(): 
     if CONFIG_OVERRIDES: 
-        twill.execute_file(CONFIG_OVERRIDES, no_reset=1)
+        twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
 
-
-def run_script(filename): 
-    print "run_script(%s)" % filename
-    twill.execute_file(filename, no_reset=1)
+def run_script(script_data): 
+    twill.execute_string(script_data, no_reset=1)
 
 def run_tests(names): 
     for name in names: 
@@ -63,36 +53,26 @@ def run_tests(names):
 
 def run_test(name): 
     try:
-        suite_file = find_suite(name)
-        print "Running suite %s"  % suite_file
-        names = parse_suite(suite_file)
-        scripts = map(find_test, names)
+        suite_data = read_suite(name)
+        script_data = parse_suite(suite_data)
         
         try: 
-            configuration = find_configuration(name)
+            configuration = read_configuration(name)
             run_script(configuration)
         except IOError: 
             print "Warning: unable to locate configuration for suite %s" % suite_file 
             pass 
 
-        do_overrides() 
-
-        for script in scripts: 
-            run_script(script)
-        
-        return 
-
     except IOError: 
-        pass 
-
-    try:
-        test_file = find_test(name)
-        do_overrides()
-        run_script(test_file)
-    except IOError: 
-        raise IOError("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
+        try:
+            script_data = read_test(name)
+        except IOError: 
+            raise IOError("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
                                                                name + TEST, 
                                                                options.search_path)) 
+
+    do_overrides()
+    run_script(script_data)
 
 def main(argv=None):
     if argv is None:
@@ -124,13 +104,13 @@ def main(argv=None):
     if options.config_file: 
         try: 
             global CONFIG_OVERRIDES 
-            CONFIG_OVERRIDES = find_configuration(options.config_file)
+            CONFIG_OVERRIDES = read_configuration(options.config_file)
         except IOError, msg: 
             die(msg)
 
     run_tests(args[1:]) 
 
-    print 'All Tests Passed'
+    print 'All Tests Passed!'
  
 
 if __name__ == '__main__':
