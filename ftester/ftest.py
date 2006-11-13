@@ -5,11 +5,10 @@ import sys
 import os 
 
 # this one's for ian 
-TEST_HOST_VARIABLE = 'test-host'
 CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
 TEST               = '.twill' 
-GLOBAL_CONFIG      = None
+CONFIG_OVERRIDES   = None
 
 
 def define_twill_vars(**kwargs): 
@@ -38,33 +37,6 @@ def find_suite(name):
 def find_test(name): 
     return find_file_type(name, TEST)
 
-def find_scripts(name): 
-    """
-    returns a list of test filenames referred to by the name given. 
-    if name refers to a suite, the list of filenames of tests 
-    in the suite is returned. 
-
-    if name refers to a test, a list containing the filename 
-    of the test is returned. 
-    """
-    try:
-        suite_file = find_suite(name)
-        names = parse_suite(suite_file)
-        scripts = []
-        for name in names: 
-            test_file = find_test(name)
-            scripts.append(test_file)
-        return scripts 
-    except IOError: 
-        pass 
-
-    try:
-        test_file = find_test(name)
-        return [test_file]
-    except IOError: 
-        raise IOError("unable to locate '%s' or '%s'" % (name + SUITE, 
-                                                         name + TEST)) 
-
 
 def parse_suite(filename): 
     all_lines = open(filename).readlines()
@@ -76,20 +48,58 @@ def parse_suite(filename):
             test_lines.append(line)
     return test_lines
 
-def run_file(filename): 
+def do_overrides(): 
+    if CONFIG_OVERRIDES: 
+        twill.execute_file(CONFIG_OVERRIDES, no_reset=1)
+
+
+def run_script(filename): 
+    print "run_script(%s)" % filename
     twill.execute_file(filename, no_reset=1)
 
+def run_tests(names): 
+    for name in names: 
+        run_test(name)
+
+def run_test(name): 
+    try:
+        suite_file = find_suite(name)
+        print "Running suite %s"  % suite_file
+        names = parse_suite(suite_file)
+        scripts = map(find_test, names)
+        
+        try: 
+            configuration = find_configuration(name)
+            run_script(configuration)
+        except IOError: 
+            print "Warning: unable to locate configuration for suite %s" % suite_file 
+            pass 
+
+        do_overrides() 
+
+        for script in scripts: 
+            run_script(script)
+        
+        return 
+
+    except IOError: 
+        pass 
+
+    try:
+        test_file = find_test(name)
+        do_overrides()
+        run_script(test_file)
+    except IOError: 
+        raise IOError("unable to locate '%s' or '%s'" % (name + SUITE, 
+                                                         name + TEST)) 
 
 def main(argv):
     parser = optparse.OptionParser()
     parser.add_option('-t','--host',
-                      help='specifies the host and port to test',
-                      dest='host', 
-                      default='http://localhost:8080')
+                      help='specifies the base url of the portal to test',
+                      dest='baseURL', 
+                      default='http://localhost:8080/portal')
     parser.add_option('-c','--config',
-                      help='specifies file with configuration overrides',
-                      dest='config_file')
-    parser.add_option('-F','--fail-on-first',
                       help='specifies file with configuration overrides',
                       dest='config_file')
     
@@ -98,19 +108,15 @@ def main(argv):
     if len(args) < 2: 
         die("No tests specified", parser)
 
-    scripts = []
-    for name in args[1:]: 
-        scripts += find_scripts(name)
-
-    define_twill_vars(host=options.host)
+    define_twill_vars(baseURL=options.baseURL)
 
     if options.config_file: 
         try: 
-            GLOBAL_CONFIG = find_configuration(options.config_file)
+            CONFIG_OVERRIDES = find_configuration(options.config_file)
         except IOError, msg: 
             die(msg)
 
-    print "SCRIPTS: " , scripts
+    run_tests(args[1:]) 
  
 
 if __name__ == '__main__':
