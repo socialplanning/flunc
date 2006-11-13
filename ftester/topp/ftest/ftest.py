@@ -127,6 +127,8 @@ def main(argv=None):
             die(msg)
 
     run_tests(args[1:]) 
+
+    print 'All Tests Passed'
  
 
 if __name__ == '__main__':
