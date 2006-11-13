@@ -98,9 +98,11 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    parser = optparse.OptionParser()
+
+    usage = "usage: %prog [options] <test name> [test name...]"
+    parser = optparse.OptionParser(usage=usage)
     parser.add_option('-t', '--host',
-                      help='specifies the base url of the portal to test',
+                      help='specifies the base url of the portal to test [default: %default]',
                       dest='baseURL',
                       default='http://localhost:8080/portal')
     parser.add_option('-c', '--config',
@@ -109,7 +111,7 @@ def main(argv=None):
     parser.add_option('-p', '--path',
                       dest='search_path',
                       default='ftests', 
-                      help='specifies location to search for tests')
+                      help='specifies location to search for tests [default: %default]')
     
     global options 
     options, args = parser.parse_args(argv)
