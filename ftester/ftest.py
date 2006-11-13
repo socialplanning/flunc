@@ -70,9 +70,9 @@ def parse_suite(filename):
     all_lines = open(filename).readlines()
     
     test_lines = []
-    for line in lines: 
-        line.strip()
-        if len(line) and not line.startwith('#'):
+    for line in all_lines: 
+        line = line.strip()
+        if line and not line.startswith('#'):
             test_lines.append(line)
     return test_lines
 
@@ -99,7 +99,7 @@ def main(argv):
         die("No tests specified", parser)
 
     scripts = []
-    for name in args[2:]: 
+    for name in args[1:]: 
         scripts += find_scripts(name)
 
     define_twill_vars(host=options.host)
@@ -112,12 +112,7 @@ def main(argv):
 
     print "SCRIPTS: " , scripts
  
-    
-    
 
-    
-
-    
 if __name__ == '__main__':
     main(sys.argv)
 
