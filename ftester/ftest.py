@@ -112,6 +112,7 @@ def main(argv):
 
     if options.config_file: 
         try: 
+            global CONFIG_OVERRIDES 
             CONFIG_OVERRIDES = find_configuration(options.config_file)
         except IOError, msg: 
             die(msg)
