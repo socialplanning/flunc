@@ -93,7 +93,7 @@ def run_test(name):
         raise IOError("unable to locate '%s' or '%s'" % (name + SUITE, 
                                                          name + TEST)) 
 
-def main(argv):
+def main(argv=None):
     parser = optparse.OptionParser()
     parser.add_option('-t','--host',
                       help='specifies the base url of the portal to test',
