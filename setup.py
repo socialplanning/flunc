@@ -18,7 +18,8 @@ setup(name="topp_ftester",
       packages=find_packages(exclude=[]),
       zip_safe=False,
       install_requires=[
-        'twill'
+        'twill',
+        'TestGen4Web-Python',
       ],
       include_package_data=True,
       entry_points="""
