@@ -1,1 +1,2 @@
--e .#egg=topp_ftester
+-f .#egg=topp_ftester
+-e topp_ftester
