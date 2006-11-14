@@ -2,8 +2,16 @@
 you should be able to setup.py develop into a working env, 
 after that: 
 
+There is a firefox extension that allows you to record tests directly
+from within your browser. To install:
+* http://developer.spikesource.com/wiki/index.php/Projects:TestGen4Web
 
-ftest --help for details 
+These tests are saved in an xml format. You
+can convert these tests into a twill script by executing:
+xmltotwill recorded.html > twillscript.twill
+
+
+ftest --help for details on running the functional tests
 
 
 by default ftest will search ./ftests/ to find tests. you can 
