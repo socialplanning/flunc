@@ -33,7 +33,7 @@ ftest -t http://localhost:8080/p -c all create_user
 
 or 
 
-ftest -c all create_user create_project destroy_project destroy_user
+ftest -c all create_user login create_project destroy_project destroy_user
 
 (specify an ad hoc suite creating and tearing down a user and project
  on default host) 
