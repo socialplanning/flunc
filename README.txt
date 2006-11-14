@@ -8,7 +8,10 @@ from within your browser. To install:
 
 These tests are saved in an xml format. You
 can convert these tests into a twill script by executing:
-xmltotwill recorded.html > twillscript.twill
+testgentotwill recorded.html > twillscript.twill
+
+Of course, you can still write tests manually. The individual tests
+are themselves twill scripts.
 
 
 ftest --help for details on running the functional tests
