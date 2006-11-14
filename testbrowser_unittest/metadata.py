@@ -1,1 +1,0 @@
-../testbrowser_doctest/metadata.py

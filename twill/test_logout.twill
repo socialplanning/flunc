@@ -1,3 +1,0 @@
-go $baseURL
-follow "Log out"
-find "You are now logged out"
