@@ -1,0 +1,9 @@
+go ${baseURL}
+follow "Join"
+fv edit_form id $user
+fv edit_form fullname $fullname
+fv edit_form email $email
+fv edit_form password $password
+fv edit_form confirm_password $password
+submit form.button.register
+find "You have been registered"
