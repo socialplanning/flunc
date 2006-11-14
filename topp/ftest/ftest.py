@@ -25,6 +25,44 @@ def read_file_type(name, ext):
     filename = os.path.join(options.search_path, name + ext)
     return open(filename).read()
 
+def list_suites():
+    names = os.listdir(options.search_path)
+    names.sort()
+    for name in names:
+        base, ext = os.path.splitext(name)
+        full = os.path.join(options.search_path, name)
+        if ext != SUITE:
+            continue
+        print '%s' % base
+        print '  from %s' % rel_filename(full)
+        f = open(full)
+        lines = f.readlines()
+        f.close()
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            if not line.startswith('#'):
+                # End of comment header
+                break
+            line = line.lstrip('# ')
+            print '    %s' % line
+
+def rel_filename(filename, relative_to=None):
+    """
+    returns the filename, shortened by seeing if it is relative
+    to the given path (CWD by default)
+    """
+    if relative_to is None:
+        relative_to = os.getcwd()
+    if not relative_to.endswith(os.path.sep):
+        relative_to += os.path.sep
+    filename = os.path.normpath(os.path.abspath(filename))
+    if filename.startswith(relative_to):
+        return filename[len(relative_to):]
+    else:
+        return filename
+
 def read_configuration(name): 
     return read_file_type(name, CONFIGURATION)
 
@@ -79,7 +117,10 @@ def main(argv=None):
         argv = sys.argv
 
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    ftest_dir = os.path.join(base_dir, 'ftests')
+    ftest_dir = rel_filename(os.path.join(base_dir, 'ftests'))
+    if not ftest_dir.startswith(os.path.sep):
+        # Suppress optparse's word wrapping:
+        ftest_dir = '.'+os.path.sep+ftest_dir
     usage = "usage: %prog [options] <test name> [test name...]"
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('-t', '--host',
@@ -93,9 +134,17 @@ def main(argv=None):
                       dest='search_path',
                       default=ftest_dir, 
                       help='specifies location to search for tests [default: %default]')
-    
+    parser.add_option('-l', '--list',
+                      dest='list_suites',
+                      action='store_true',
+                      help="List the available suites (don't test anything)")
+
     global options 
     options, args = parser.parse_args(argv)
+
+    if options.list_suites:
+        list_suites()
+        return
 
     if len(args) < 2: 
         die("No tests specified", parser)
