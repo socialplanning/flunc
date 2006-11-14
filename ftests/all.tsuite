@@ -1,3 +1,4 @@
+# runs all the plone/opencore tests
 create_user
 login
 create_project
