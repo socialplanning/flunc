@@ -78,7 +78,8 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    ftest_dir = os.path.join(base_dir, 'ftests')
     usage = "usage: %prog [options] <test name> [test name...]"
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('-t', '--host',
@@ -90,7 +91,7 @@ def main(argv=None):
                       dest='config_file')
     parser.add_option('-p', '--path',
                       dest='search_path',
-                      default='ftests', 
+                      default=ftest_dir, 
                       help='specifies location to search for tests [default: %default]')
     
     global options 
