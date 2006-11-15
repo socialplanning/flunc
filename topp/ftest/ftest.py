@@ -137,7 +137,10 @@ def handle_exception(msg, e):
                 print "Unable to save to: %s" % options.dump_file
                 print e.args[0]
 
-    print "X ", msg, ":", e.args[0]
+    if e.args:
+        print "X ", msg, ":", e.args[0]
+    else:
+        print "X ", msg
     if options.interactive:
         sys.argv[1:] = []
         # twill shell takes arguments from sys.argv
