@@ -1,4 +1,5 @@
 go ${base_url}/projects/${projname}
+notfind "Project Roster"
 follow "Project Preferences"
 fv edit_form featurelets:list "openroster" 
 submit form_submit
