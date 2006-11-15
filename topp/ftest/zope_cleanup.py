@@ -11,14 +11,14 @@ def get_twill_var(varname):
     twill_globals, twill_locals = get_twill_glocals()
     return twill_globals[varname]
 
-def zope_delobject(container, object): 
-    print "(zope) Deleting %s from %s" % (object,container)
+def zope_delobject(container, obj): 
+    print "(zope) Deleting %s from %s" % (obj, container)
     base_url = get_twill_var('base_url') 
     admin_user = get_twill_var('admin')
     admin_pw = get_twill_var('adminpw')
     
     scheme, uri = urllib.splittype(base_url) 
     host, path = urllib.splithost(uri)
-    authURL = "%s://%s:%s@%s%s" % (scheme, admin_user, admin_pw, host, path)
-    portal = XMLRPCServer(authURL)
-    getattr(portal,container).manage_delObjects([object])
+    auth_url = "%s://%s:%s@%s%s" % (scheme, admin_user, admin_pw, host, path)
+    portal = XMLRPCServer(auth_url)
+    getattr(portal, container).manage_delObjects([obj])
