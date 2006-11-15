@@ -1,0 +1,5 @@
+go ${base_url}
+fv searchform searchGadget $user
+submit
+find "Search results"
+find ${fullname}
