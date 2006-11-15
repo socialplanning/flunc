@@ -6,12 +6,14 @@ import twill
 from twill.namespaces import get_twill_glocals
 from twill.errors import TwillAssertionError
 
-# this one's for ian 
+
 CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
 TEST               = '.twill' 
 CONFIG_OVERRIDES   = None
+# these are for ian 
 options = {}
+name_lookup = {}
 
 def define_twill_vars(**kwargs): 
     tglobals, tlocals = get_twill_glocals()
@@ -24,17 +26,55 @@ def die(message, parser=None):
     sys.exit(0)
 
 def read_file_type(name, ext): 
-    filename = os.path.join(options.search_path, name + ext)
-    return open(filename).read()
+    try: 
+        filename = name_lookup[name + ext]
+        return open(filename).read()
+    except KeyError:
+        raise IOError('Unable to locate %s in the search path' % (name + ext))
+    
+
+def scan_for_tests(root): 
+    """
+    recursively scans for relevant files in the directory given
+    """
+    print "* scanning for tests in '%s'" % root
+    found = {} 
+
+    def check_files(files):
+        for filename in files: 
+            base, ext = os.path.splitext(filename)
+            if ext in (TEST, SUITE, CONFIGURATION):
+                if filename in found: 
+                    print "! Warning: ignoring %s in %s (already found: %s)" % \
+                        (filename, root, found[filename])
+                else: 
+                    found[filename] = os.path.join(root, filename)
+                    
+
+    if options.recursive:
+        # XXX this is DFS, it probably should do BFS ? 
+        for root, dirs, files in os.walk(root): 
+            check_files(files)
+    else: 
+        check_files(os.listdir(root))
+        
+                
+    return found 
+
+            
 
 def list_suites():
-    names = os.listdir(options.search_path)
+    names = name_lookup.keys()
     names.sort()
+    
+    found_suite = False 
     for name in names:
         base, ext = os.path.splitext(name)
-        full = os.path.join(options.search_path, name)
+        full = name_lookup[name]
+
         if ext != SUITE:
             continue
+        found_suite = True 
         print '%s' % base
         print '  from %s' % rel_filename(full)
         f = open(full)
@@ -49,6 +89,8 @@ def list_suites():
                 break
             line = line.lstrip('# ')
             print '    %s' % line
+    if not found_suite:
+        print "No suites found"
 
 def rel_filename(filename, relative_to=None):
     """
@@ -96,7 +138,7 @@ def handle_exception(msg, e):
                 print "Unable to save to: %s" % options.dump_file
                 print e.args[0]
 
-    print msg, ":", e.args[0]
+    print "X ", msg, ":", e.args[0]
     if options.interactive:
         sys.argv[1:] = []
         # twill shell takes arguments from sys.argv
@@ -127,11 +169,11 @@ def run_test(name):
         try: 
             configuration = read_configuration(name)
             run_script(configuration)
-            print "* loaded configuration: %s" % name + CONFIGURATION
+            print "* loaded configuration: %s" % (name + CONFIGURATION)
         except IOError: 
-            print "Warning: unable to locate configuration for suite %s" % name + SUITE
-        except TwillAssertionError:
-            handle_exception("Invalid configuration: '%s'" % name + CONFIGURATION)
+            print "! Warning: unable to locate configuration for suite %s" % (name + SUITE)
+        except TwillAssertionError,e:
+            handle_exception("Invalid configuration: '%s'" % (name + CONFIGURATION), e)
         
         run_tests(names)
         return
@@ -147,10 +189,14 @@ def run_test(name):
         script = read_test(name)
         run_script(script)
     except IOError, e: 
-        handle_exception("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
-                                                                  name + TEST, 
-                                                                  options.search_path),
-                         e)
+        # reraise with more specific message
+        try: 
+            raise IOError("Unable to locate '%s' or '%s' in search path" % (name + SUITE, 
+                                                                            name + TEST))
+        except IOError, e: 
+            handle_exception("ERROR", e)
+                          
+
     except TwillAssertionError, e:
         handle_exception("ERROR : %s" % name, e)
 
@@ -172,14 +218,18 @@ def main(argv=None):
     parser.add_option('-c', '--config',
                       help='specifies file with configuration overrides',
                       dest='config_file')
-    parser.add_option('-p', '--path',
-                      dest='search_path',
-                      default=ftest_dir, 
-                      help='specifies location to search for tests [default: %default]')
     parser.add_option('-l', '--list',
                       dest='list_suites',
                       action='store_true',
                       help="List the available suites (don't test anything)")
+    parser.add_option('-p', '--path',
+                      dest='search_path',
+                      default=ftest_dir, 
+                      help='specifies location to search for tests [default: %default]')
+    parser.add_option('-r', '--recursive',
+                      dest='recursive',
+                      action='store_true',
+                      help="search recursively for tests in the search path")
     parser.add_option('-v', '--verbose',
                       dest='verbose',
                       action='store_true',
@@ -194,6 +244,9 @@ def main(argv=None):
 
     global options 
     options, args = parser.parse_args(argv)
+
+    global name_lookup 
+    name_lookup = scan_for_tests(options.search_path)
 
     if options.list_suites:
         list_suites()
