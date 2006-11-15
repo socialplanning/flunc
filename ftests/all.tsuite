@@ -3,6 +3,7 @@ create_user
 login
 create_project
 edit_project
+search_user
 logout
 destroy_project
 destroy_user
