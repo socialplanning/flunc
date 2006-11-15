@@ -4,7 +4,6 @@ import os
 
 import twill 
 from twill.namespaces import get_twill_glocals
-from twill.errors import TwillAssertionError
 
 
 CONFIGURATION      = '.conf'
@@ -149,7 +148,7 @@ def do_overrides():
     if CONFIG_OVERRIDES: 
         try:
             twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
-        except TwillAssertionError, e:
+        except Exception, e:
             handle_exception('ERROR in global configuration', e)
 
 def run_script(script_data): 
@@ -172,7 +171,7 @@ def run_test(name):
             print "* loaded configuration: %s" % (name + CONFIGURATION)
         except IOError: 
             print "! Warning: unable to locate configuration for suite %s" % (name + SUITE)
-        except TwillAssertionError,e:
+        except Exception,e:
             handle_exception("Invalid configuration: '%s'" % (name + CONFIGURATION), e)
         
         run_tests(names)
@@ -197,7 +196,7 @@ def run_test(name):
             handle_exception("ERROR", e)
                           
 
-    except TwillAssertionError, e:
+    except Exception, e:
         handle_exception("ERROR : %s" % name, e)
 
 def main(argv=None):
