@@ -1,0 +1,3 @@
+# destroys a user and a project 
+destroy_project
+destroy_user
