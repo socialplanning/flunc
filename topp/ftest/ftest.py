@@ -238,7 +238,7 @@ def main(argv=None):
                       dest='interactive',
                       action='store_true',
                       help="Fall into twill shell on error")
-    parser.add_option('-d','--dump-html',
+    parser.add_option('-d', '--dump-html',
                       dest='dump_file',
                       help="dump current HTML to file specified on error. specify - for stdout.")
 
