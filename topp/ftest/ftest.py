@@ -79,14 +79,36 @@ def parse_suite(suite_data):
                               not line.lstrip().startswith('#')
     return filter(valid_line, suite_data.splitlines())
 
+def handle_exception(msg, e):
+    if options.verbose:
+        import traceback
+        traceback.print_exception(*sys.exc_info())
+
+    if options.dumpfile:
+        html = twill.get_browser().get_html()
+        if options.dumpfile == '-':
+            print html
+        else:
+            try:
+                open(options.dumpfile, 'w').write(html)
+                print "* saved html to: %s" % options.dumpfile
+            except IOError, e:
+                print "Unable to save to: %s" % options.dumpfile
+                print e.args[0]
+
+    print msg, ":", e.args[0]
+    if options.interactive:
+        sys.argv[1:] = []
+        # twill shell takes arguments from sys.argv
+        twill.shell.main()
+    sys.exit(1)
+
 def do_overrides(): 
     if CONFIG_OVERRIDES: 
         try:
             twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
         except TwillAssertionError, e:
-            if options.verbose: raise e
-            print 'ERROR in global configuration'
-            sys.exit(1)
+            handle_exception('ERROR in global configuration', e)
 
 def run_script(script_data): 
     twill.execute_string(script_data, no_reset=1)
@@ -109,8 +131,7 @@ def run_test(name):
         except IOError: 
             print "Warning: unable to locate configuration for suite %s" % suite_file 
         except TwillAssertionError:
-            print "Invalid configuration: '%s'" % name + CONFIGURATION
-            return
+            handle_exception("Invalid configuration: '%s'" % name + CONFIGURATION)
         
         run_tests(names)
         return
@@ -125,14 +146,13 @@ def run_test(name):
         print "* running test: %s" % name
         script = read_test(name)
         run_script(script)
-    except IOError: 
-        raise IOError("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
-                                                               name + TEST, 
-                                                               options.search_path))
+    except IOError, e: 
+        handle_exception("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
+                                                                  name + TEST, 
+                                                                  options.search_path),
+                         e)
     except TwillAssertionError, e:
-        if options.verbose: raise e
-        print "ERROR: %s" % name
-        sys.exit(1)
+        handle_exception("ERROR : %s" % name, e)
 
 def main(argv=None):
     if argv is None:
@@ -164,6 +184,13 @@ def main(argv=None):
                       dest='verbose',
                       action='store_true',
                       help="Display stack traces from twill")
+    parser.add_option('-i', '--interactive-debug',
+                      dest='interactive',
+                      action='store_true',
+                      help="Fall into twill shell on error")
+    parser.add_option('-d','--dump-html',
+                      dest='dumpfile',
+                      help="dump current HTML to file specified on error. specify - for stdout.")
 
     global options 
     options, args = parser.parse_args(argv)
