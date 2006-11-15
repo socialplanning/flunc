@@ -1,0 +1,6 @@
+go ${base_url}/projects/${projname}
+follow "Project Preferences"
+fv edit_form featurelets:list "listen" 
+submit form_submit
+follow "Mailing Lists" 
+find "Add mailing list"

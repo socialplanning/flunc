@@ -3,6 +3,10 @@ create_user
 login
 create_project
 edit_project
+enable_roster
+disable_roster
+enable_listen
+disable_listen
 search_user
 logout
 destroy_project
