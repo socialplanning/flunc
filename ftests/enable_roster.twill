@@ -1,0 +1,7 @@
+go ${base_url}/projects/${projname}
+follow "Project Preferences"
+fv edit_form featurelets:list "openroster" 
+submit form_submit
+follow "Project Roster" 
+find "Team Roster"
+find $user
