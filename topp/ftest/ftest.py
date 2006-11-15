@@ -129,7 +129,7 @@ def run_test(name):
             run_script(configuration)
             print "* loaded configuration: %s" % name + CONFIGURATION
         except IOError: 
-            print "Warning: unable to locate configuration for suite %s" % suite_file 
+            print "Warning: unable to locate configuration for suite %s" % name + SUITE
         except TwillAssertionError:
             handle_exception("Invalid configuration: '%s'" % name + CONFIGURATION)
         
