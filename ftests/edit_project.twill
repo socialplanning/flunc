@@ -1,4 +1,4 @@
-go ${baseURL}/projects
+go ${base_url}/projects
 follow $projname
 follow "Edit"
 fv edit_form title $projtitle

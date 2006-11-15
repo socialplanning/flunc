@@ -84,16 +84,16 @@ def handle_exception(msg, e):
         import traceback
         traceback.print_exception(*sys.exc_info())
 
-    if options.dumpfile:
+    if options.dump_file:
         html = twill.get_browser().get_html()
-        if options.dumpfile == '-':
+        if options.dump_file == '-':
             print html
         else:
             try:
-                open(options.dumpfile, 'w').write(html)
-                print "* saved html to: %s" % options.dumpfile
+                open(options.dump_file, 'w').write(html)
+                print "* saved html to: %s" % options.dump_file
             except IOError, e:
-                print "Unable to save to: %s" % options.dumpfile
+                print "Unable to save to: %s" % options.dump_file
                 print e.args[0]
 
     print msg, ":", e.args[0]
@@ -167,7 +167,7 @@ def main(argv=None):
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('-t', '--host',
                       help='specifies the base url of the portal to test [default: %default]',
-                      dest='baseURL',
+                      dest='base_url',
                       default='http://localhost:8080/portal')
     parser.add_option('-c', '--config',
                       help='specifies file with configuration overrides',
@@ -189,7 +189,7 @@ def main(argv=None):
                       action='store_true',
                       help="Fall into twill shell on error")
     parser.add_option('-d','--dump-html',
-                      dest='dumpfile',
+                      dest='dump_file',
                       help="dump current HTML to file specified on error. specify - for stdout.")
 
     global options 
@@ -202,7 +202,7 @@ def main(argv=None):
     if len(args) < 2: 
         die("No tests specified", parser)
 
-    define_twill_vars(baseURL=options.baseURL)
+    define_twill_vars(base_url=options.base_url)
 
     if options.config_file: 
         try: 

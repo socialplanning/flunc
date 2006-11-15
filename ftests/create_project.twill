@@ -1,4 +1,4 @@
-go ${baseURL}
+go ${base_url}
 follow "Start a Project"
 fv add_form title $projname
 fv add_form full_name $projfullname
