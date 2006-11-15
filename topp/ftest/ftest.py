@@ -1,8 +1,10 @@
-import twill 
-from twill.namespaces import get_twill_glocals
 import optparse 
 import sys
 import os 
+
+import twill 
+from twill.namespaces import get_twill_glocals
+from twill.errors import TwillAssertionError
 
 # this one's for ian 
 CONFIGURATION      = '.conf'
@@ -75,12 +77,16 @@ def read_test(name):
 def parse_suite(suite_data): 
     valid_line = lambda line: line.strip() and\
                               not line.lstrip().startswith('#')
-    file_names = filter(valid_line, suite_data.splitlines())
-    return '\n'.join(map(read_test, file_names))
+    return filter(valid_line, suite_data.splitlines())
 
 def do_overrides(): 
     if CONFIG_OVERRIDES: 
-        twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
+        try:
+            twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
+        except TwillAssertionError, e:
+            if options.verbose: raise e
+            print 'ERROR in global configuration'
+            sys.exit(1)
 
 def run_script(script_data): 
     twill.execute_string(script_data, no_reset=1)
@@ -92,25 +98,41 @@ def run_tests(names):
 def run_test(name): 
     try:
         suite_data = read_suite(name)
-        script_data = parse_suite(suite_data)
+        print "* running suite: %s" % name 
+
+        names = parse_suite(suite_data)
         
         try: 
             configuration = read_configuration(name)
             run_script(configuration)
+            print "* loaded configuration: %s" % name + CONFIGURATION
         except IOError: 
             print "Warning: unable to locate configuration for suite %s" % suite_file 
-            pass 
+        except TwillAssertionError:
+            print "Invalid configuration: '%s'" % name + CONFIGURATION
+            return
+        
+        run_tests(names)
+        return
 
     except IOError: 
-        try:
-            script_data = read_test(name)
-        except IOError: 
-            raise IOError("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
-                                                               name + TEST, 
-                                                               options.search_path)) 
+        # not a suite, try a test
+        pass
 
     do_overrides()
-    run_script(script_data)
+        
+    try:
+        print "* running test: %s" % name
+        script = read_test(name)
+        run_script(script)
+    except IOError: 
+        raise IOError("unable to locate '%s' or '%s' in %s" % (name + SUITE, 
+                                                               name + TEST, 
+                                                               options.search_path))
+    except TwillAssertionError, e:
+        if options.verbose: raise e
+        print "ERROR: %s" % name
+        sys.exit(1)
 
 def main(argv=None):
     if argv is None:
@@ -138,6 +160,10 @@ def main(argv=None):
                       dest='list_suites',
                       action='store_true',
                       help="List the available suites (don't test anything)")
+    parser.add_option('-v', '--verbose',
+                      dest='verbose',
+                      action='store_true',
+                      help="Display stack traces from twill")
 
     global options 
     options, args = parser.parse_args(argv)
