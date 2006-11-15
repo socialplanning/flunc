@@ -1,4 +1,4 @@
-go ${baseURL}
+go ${base_url}
 follow "Join"
 fv edit_form id $user
 fv edit_form fullname $fullname

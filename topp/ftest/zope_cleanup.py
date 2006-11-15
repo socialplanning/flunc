@@ -13,7 +13,7 @@ def get_twill_var(varname):
 
 def zope_delobject(container, object): 
     print "(zope) Deleting %s from %s" % (object,container)
-    base_url = get_twill_var('baseURL') 
+    base_url = get_twill_var('base_url') 
     admin_user = get_twill_var('admin')
     admin_pw = get_twill_var('adminpw')
     
