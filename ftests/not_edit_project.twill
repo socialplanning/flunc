@@ -1,0 +1,6 @@
+go ${base_url}
+follow "Projects"
+follow $projname
+follow "Edit"
+find "Insufficient Privileges"
+

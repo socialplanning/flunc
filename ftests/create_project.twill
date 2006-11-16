@@ -2,5 +2,6 @@ go ${base_url}
 follow "Start a Project"
 fv add_form title $projname
 fv add_form full_name $projfullname
+fv add_form workflow_policy $projpolicy
 submit form_submit
 find "Project Preferences"

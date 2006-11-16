@@ -1,0 +1,42 @@
+# test project policies 
+
+# create a coulple of users 
+create_user(user=${u1_name}, fullname=${u1_fullname})
+create_user(user=${u2_name}, fullname=${u2_fullname})
+
+# u1 will create a project (initially open) 
+login(user=${u1_name})
+create_project
+change_project_policy(projpolicy='open_policy')
+logout 
+
+# u2 be able to see it, and edit it 
+login(user=${u2_name})
+project_listed
+edit_project 
+logout 
+
+
+# now u1 changes it to medium 
+login(user=${u1_name})
+change_project_policy(projpolicy='medium_policy')
+logout 
+
+# u2 should now be able to see it, but not edit it 
+login(user=${u2_name})
+project_listed
+not_edit_project 
+logout 
+
+# now u1 changes it to closed 
+login(user=${u1_name})
+change_project_policy(projpolicy='medium_policy')
+logout 
+
+# u2 should not be able to see it 
+login(user=${u2_name})
+project_not_listed
+logout 
+
+# cleanup 
+policy_cleanup
