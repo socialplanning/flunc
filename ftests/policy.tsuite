@@ -1,4 +1,4 @@
-# test project policies 
+# suite of project policy tests 
 
 # create a coulple of users 
 create_user(user=${u1_name}, fullname=${u1_fullname})
