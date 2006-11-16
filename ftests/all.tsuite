@@ -1,6 +1,7 @@
 # runs all the plone/opencore tests
 create_user
 login
+edit_user_preferences
 create_project
 edit_project
 enable_roster
