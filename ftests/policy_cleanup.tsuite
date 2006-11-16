@@ -1,3 +1,5 @@
+# destroys artifacts of the policy suite
+
 destroy_user(user=${u1_name})
 destroy_user(user=${u2_name})
 destroy_project
