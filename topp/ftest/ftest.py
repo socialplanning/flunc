@@ -1,10 +1,10 @@
 import optparse 
 import sys
 import os 
-
 import twill 
 from twill.namespaces import get_twill_glocals
 
+from parser import parse_test_call, make_dict_from_call, make_twill_local_defs
 
 CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
@@ -118,7 +118,7 @@ def read_test(name):
 def parse_suite(suite_data): 
     valid_line = lambda line: line.strip() and\
                               not line.lstrip().startswith('#')
-    return filter(valid_line, suite_data.splitlines())
+    return map(parse_test_call,filter(valid_line, suite_data.splitlines()))
 
 def handle_exception(msg, e):
     if options.verbose:
@@ -157,16 +157,16 @@ def do_overrides():
 def run_script(script_data): 
     twill.execute_string(script_data, no_reset=1)
 
-def run_tests(names): 
-    for name in names: 
-        run_test(name)
+def run_tests(calls): 
+    for name,args in calls: 
+        run_test(name,args)
 
-def run_test(name): 
+def run_test(name,args): 
     try:
         suite_data = read_suite(name)
         print "* running suite: %s" % name 
 
-        names = parse_suite(suite_data)
+        calls = parse_suite(suite_data)
         
         try: 
             configuration = read_configuration(name)
@@ -177,7 +177,7 @@ def run_test(name):
         except Exception,e:
             handle_exception("Invalid configuration: '%s'" % (name + CONFIGURATION), e)
         
-        run_tests(names)
+        run_tests(calls)
         return
 
     except IOError: 
@@ -189,6 +189,7 @@ def run_test(name):
     try:
         print "* running test: %s" % name
         script = read_test(name)
+        script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
         run_script(script)
     except IOError, e: 
         # reraise with more specific message
@@ -266,7 +267,7 @@ def main(argv=None):
         except IOError, msg: 
             die(msg)
 
-    run_tests(args[1:]) 
+    run_tests(map(parse_test_call,args[1:])) 
 
     print 'All Tests Passed!'
  
