@@ -1,0 +1,10 @@
+extend_with topp.ftest.checkbox
+
+go ${base_url}/projects/${projname}
+follow "Project Preferences"
+follow "manage membership"
+#fv change_type paths:list "${base_path}/portal_teams/${projname}/${membername}"
+edit_checkbox change_type paths:list "${base_path}/portal_teams/${projname}/${membername}"
+submit folder_delete:method
+notfind "Existing Members.*${membername}" s 
+

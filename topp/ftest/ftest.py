@@ -1,6 +1,7 @@
 import optparse 
 import sys
 import os 
+import urllib
 import twill 
 from twill.namespaces import get_twill_glocals
 
@@ -258,7 +259,23 @@ def main(argv=None):
     if len(args) < 2: 
         die("No tests specified", parser)
 
+    scheme, uri = urllib.splittype(options.base_url)
+    if scheme is None: 
+        print "! Warning: no scheme specified in test url, assuming http"
+        options.base_url = "http://" + options.base_url 
+    elif not scheme == 'http' and not scheme == 'https':
+        die("unsupported scheme '%s' in '%s'" % (scheme,options.base_url))
+    
+
+    host, path = urllib.splithost(uri)
+   
+    print "* Running against %s, host: %s path=%s" % \
+        (options.base_url,host,path)
+    # define utility variables to help point scripts at desired location
     define_twill_vars(base_url=options.base_url)
+    define_twill_vars(base_host=host)
+    define_twill_vars(base_path=path)
+    
 
     if options.config_file: 
         try: 

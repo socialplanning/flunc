@@ -1,0 +1,11 @@
+extend_with topp.ftest.checkbox 
+
+go ${base_url}/projects/${projname}
+follow "Project Preferences"
+follow "manage membership"
+fv localrole search_term $membername
+submit 
+#fv change_type member_infos:list $membername
+edit_checkbox change_type member_infos:list $membername
+submit 
+find "Existing Members.*${membername}" s 
