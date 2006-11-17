@@ -1,3 +1,10 @@
+#
+# logs out the current user 
+#
+# expects: 
+#   logged in as someone 
+#
+
 go $base_url
 follow "Log out"
 find "You are now logged out"

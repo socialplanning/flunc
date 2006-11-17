@@ -1,3 +1,12 @@
+#
+# enables the project roster featurelet in a project 
+#
+# projname - the project id to enable the roster in  
+#
+# expects: 
+#   project exists, logged in as project admin
+#
+
 go ${base_url}/projects/${projname}
 notfind "Project Roster"
 follow "Project Preferences"
