@@ -1,4 +1,4 @@
-extend_with topp.ftest.checkbox 
+extend_with flunc.checkbox 
 
 go ${base_url}/projects/${projname}
 follow "Project Preferences"

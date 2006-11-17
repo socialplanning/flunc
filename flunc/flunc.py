@@ -208,7 +208,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    base_dir = os.path.dirname(os.path.dirname(__file__))
     ftest_dir = rel_filename(os.path.join(base_dir, 'ftests'))
     if not ftest_dir.startswith(os.path.sep):
         # Suppress optparse's word wrapping:
