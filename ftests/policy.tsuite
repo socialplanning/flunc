@@ -10,17 +10,22 @@ create_project
 change_project_policy(projpolicy='open_policy')
 logout 
 
-# u2 be able to see it, and edit it 
+# should be able to see it as anonymous
+project_listed
+
+# login as u2, should be able to see it, and edit it 
 login(user=${u2_name})
 project_listed
 edit_project 
 logout 
 
-
 # now u1 changes it to medium 
 login(user=${u1_name})
 change_project_policy(projpolicy='medium_policy')
 logout 
+
+# should be able to see it as anonymous
+project_listed 
 
 # u2 should now be able to see it, but not edit it 
 login(user=${u2_name})
@@ -28,15 +33,42 @@ project_listed
 not_edit_project 
 logout 
 
+# now u1 adds u2 as a member 
+login(user=${u1_name})
+add_project_member(membername=${u2_name})
+logout 
+
+# now u2 should be able to edit 
+login(user=${u2_name})
+project_listed
+edit_project 
+logout 
+
 # now u1 changes it to closed 
 login(user=${u1_name})
 change_project_policy(projpolicy='medium_policy')
 logout 
 
+# u2 should still be able to see and edit 
+login(user=${u2_name})
+project_listed
+edit_project 
+logout 
+
+
+# now u1 removes u2 as a member 
+login(user=${u1_name})
+remove_project_member(membername=${u2_name})
+logout 
+
+
 # u2 should not be able to see it 
 login(user=${u2_name})
 project_not_listed
 logout 
+
+# anonymous shouldn't see it either
+project_not_listed
 
 # cleanup 
 policy_cleanup
