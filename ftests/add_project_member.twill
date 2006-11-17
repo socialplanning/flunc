@@ -1,3 +1,14 @@
+#
+# adds a member to a project 
+#
+# projname - the project to add the member to 
+# membername - the member to add 
+#
+# expects: 
+#    project exists, member exists, logged in as project admin
+#
+#
+
 extend_with flunc.checkbox 
 
 go ${base_url}/projects/${projname}

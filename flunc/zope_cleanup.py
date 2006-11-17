@@ -11,13 +11,10 @@ def get_twill_var(varname):
     twill_globals, twill_locals = get_twill_glocals()
     return twill_globals[varname]
 
-def zope_delobject(container, obj): 
+def zope_delobject(container, obj, admin_user, admin_pw): 
     base_url = get_twill_var('base_url') 
 
     print "(zope) Deleting %s from %s on %s" % (obj, container, base_url)
-
-    admin_user = get_twill_var('admin')
-    admin_pw = get_twill_var('adminpw')
     
     scheme, uri = urllib.splittype(base_url) 
     host, path = urllib.splithost(uri)

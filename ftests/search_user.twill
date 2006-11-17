@@ -1,3 +1,11 @@
+#
+# asserts that a user can be found via the search widget
+#
+# user - user to search for 
+#
+
+
+
 go ${base_url}
 fv searchform searchGadget $user
 submit

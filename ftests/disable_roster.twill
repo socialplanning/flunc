@@ -1,3 +1,12 @@
+#
+# disables the project roster featurelet in a project 
+#
+# projname - the project id to disable the roster in 
+# 
+# expects: 
+#   project exists, logged in as project admin
+#
+
 go ${base_url}/projects/${projname}
 find "Project Roster"
 follow "Project Preferences"

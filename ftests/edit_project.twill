@@ -1,3 +1,16 @@
+#
+# edits a given project 
+#
+# projname - the id of the project to edit 
+# projtitle - the title to set for the project
+# projdesc - the description to set for the project 
+# projbody - the body text of the home page to set 
+#
+# expects: 
+#   project exists
+#
+
+
 go ${base_url}/projects
 follow $projname
 follow "Edit"

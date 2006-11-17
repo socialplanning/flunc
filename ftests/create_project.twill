@@ -1,3 +1,16 @@
+#
+# create a project 
+#
+# projname - the id of the project 
+# projfullname - the full name of the project 
+# projpolicy - the initial security policy 
+#              [open_policy,medium_policy,closed_policy]
+# 
+# expects: 
+#    logged in 
+#
+
+
 go ${base_url}
 follow "Start a Project"
 fv add_form title $projname

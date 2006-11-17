@@ -1,3 +1,15 @@
+#
+# edit user preferences 
+#
+# fullname - changes users full name to this  
+# email - changes users email address to this 
+# location - changes users location to this 
+#
+# expects: 
+#   logged in as user 
+#
+
+
 go ${base_url}
 follow "My Info"
 find "Edit Personal Info and Preferences"
