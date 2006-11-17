@@ -1,4 +1,4 @@
-extend_with topp.ftest.zope_cleanup
+extend_with flunc.zope_cleanup
 
 zope_delobject 'projects' $projname
 zope_delobject 'portal_teams' $projname

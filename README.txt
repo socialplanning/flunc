@@ -14,29 +14,29 @@ Of course, you can still write tests manually. The individual tests
 are themselves twill scripts.
 
 
-ftest --help for details on running the functional tests
+flunc --help for details on running the functional tests
 
 
-by default ftest will search ./ftests/ to find tests. you can 
+by default flunc will search ./ftests/ to find tests. you can 
 change this with the -p (--path) option 
 
 
-ftest all 
+flunc all 
 
 [runs all tests listed in all.tsuite against localhost:8080/portal]
 
-ftest -t http://localhost:8080/some_portal all 
+flunc -t http://localhost:8080/some_portal all 
 [runs all tests listed in all.tsuite against localhost:8080/some_portal]
 
 or 
 
-ftest -t http://localhost:8080/p -c all create_user
+flunc -t http://localhost:8080/p -c all create_user
 
 (runs create_user.twill using all.conf) 
 
 or 
 
-ftest -c all create_user login create_project destroy_project destroy_user
+flunc -c all create_user login create_project destroy_project destroy_user
 
 (specify an ad hoc suite creating and tearing down a user and project
  on default host) 

@@ -2,7 +2,7 @@ __version__ = '0.1'
 
 from setuptools import setup, find_packages
 
-setup(name="topp_ftester",
+setup(name="flunc",
       version=__version__,
       description="",
       long_description="""\
@@ -24,7 +24,7 @@ setup(name="topp_ftester",
       include_package_data=True,
       entry_points="""
       [console_scripts]
-      ftest = topp.ftest.ftest:main
+      flunc = flunc.flunc:main
       """,
       )
 
