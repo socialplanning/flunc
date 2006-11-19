@@ -70,5 +70,3 @@ logout
 # anonymous shouldn't see it either
 project_not_listed
 
-# cleanup 
-policy_cleanup
