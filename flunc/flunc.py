@@ -10,8 +10,9 @@ from parser import parse_test_call, make_dict_from_call, make_twill_local_defs
 CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
 TEST               = '.twill' 
+CLEANUP            = '_cleanup'
 CONFIG_OVERRIDES   = None
-# these are for ian 
+
 options = {}
 name_lookup = {}
 
@@ -19,25 +20,21 @@ def define_twill_vars(**kwargs):
     tglobals, tlocals = get_twill_glocals()
     tglobals.update(kwargs)
 
-def die(message, parser=None): 
-    print message 
-    if parser is not None:
-        parser.print_usage()
-    sys.exit(0)
-
 def read_file_type(name, ext): 
     try: 
         filename = name_lookup[name + ext]
         return open(filename).read()
     except KeyError:
         raise IOError('Unable to locate %s in the search path' % (name + ext))
-    
+
+def file_exists(name,ext):
+    return name_lookup.has_key(name + ext)
 
 def scan_for_tests(root): 
     """
     recursively scans for relevant files in the directory given
     """
-    print "* scanning for tests in '%s'" % root
+    log_info("scanning for tests in '%s'" % root)
     found = {} 
 
     def check_files(files):
@@ -45,8 +42,8 @@ def scan_for_tests(root):
             base, ext = os.path.splitext(filename)
             if ext in (TEST, SUITE, CONFIGURATION):
                 if filename in found: 
-                    print "! Warning: ignoring %s in %s (already found: %s)" % \
-                        (filename, root, found[filename])
+                    log_warn("ignoring %s in %s (already found: %s)" % \
+                         (filename, root, found[filename]))
                 else: 
                     found[filename] = os.path.join(root, filename)
                     
@@ -61,8 +58,7 @@ def scan_for_tests(root):
                 
     return found 
 
-            
-
+    
 def list_suites():
     names = name_lookup.keys()
     names.sort()
@@ -72,7 +68,7 @@ def list_suites():
         base, ext = os.path.splitext(name)
         full = name_lookup[name]
 
-        if ext != SUITE:
+        if ext != SUITE or base.endswith(CLEANUP):
             continue
         found_suite = True 
         print '%s' % base
@@ -116,16 +112,38 @@ def read_suite(name):
 def read_test(name): 
     return read_file_type(name, TEST)
 
+def has_cleanup_handler(name):
+    return file_exists(name + CLEANUP, SUITE)
+
+def read_cleanup_for(name):
+    return read_file_type(name + CLEANUP, SUITE)
+
 def parse_suite(suite_data): 
     valid_line = lambda line: line.strip() and\
                               not line.lstrip().startswith('#')
     return map(parse_test_call,filter(valid_line, suite_data.splitlines()))
 
-def handle_exception(msg, e):
+def maybe_print_stack(): 
     if options.verbose:
         import traceback
         traceback.print_exception(*sys.exc_info())
 
+def do_twill_repl():
+    welcome_msg = "\n interactive twill debugger. type 'help' for options\n"
+    
+    repl = twill.shell.TwillCommandLoop()
+
+    while 1:
+        try:
+            repl.cmdloop(welcome_msg)
+        except KeyboardInterrupt:
+            sys.stdout.write('\n')
+        except SystemExit:
+            raise
+
+def handle_exception(msg, e, cleanup_stack):
+    maybe_print_stack()
+    
     if options.dump_file:
         html = twill.get_browser().get_html()
         if options.dump_file == '-':
@@ -133,76 +151,134 @@ def handle_exception(msg, e):
         else:
             try:
                 open(options.dump_file, 'w').write(html)
-                print "* saved html to: %s" % options.dump_file
+                log_info("saved html to: %s" % options.dump_file)
             except IOError, e:
-                print "Unable to save to: %s" % options.dump_file
-                print e.args[0]
+                log_warn("Unable to save to: %s" % options.dump_file)
 
     if e.args:
-        print "X ", msg, ":", e.args[0]
+        log_error("%s (%s)" % (msg,e.args[0]))
     else:
-        print "X ", msg
+        log_error(msg)
     if options.interactive:
-        sys.argv[1:] = []
-        # twill shell takes arguments from sys.argv
-        twill.shell.main()
+        try: 
+            do_twill_repl()
+        except Exception:
+            pass 
+
+
+    do_cleanup(cleanup_stack)
+
     sys.exit(1)
 
-def do_overrides(): 
+
+def do_cleanup(cleanup_stack): 
+    while len(cleanup_stack):
+        do_cleanup_for(cleanup_stack.pop())
+
+def do_cleanup_for(name):
+    if has_cleanup_handler(name): 
+        log_info("running cleanup handler for %s" % name)
+        try:
+            suite_data = read_cleanup_for(name)
+            calls = parse_suite(suite_data)
+            for script,args in calls:
+                try:
+                    if file_exists(script,SUITE):
+                        log_warn("Cannot call sub-suite %s during cleanup." % name)
+                    else:
+                        run_test(script,args,[])
+                except Exception, e:
+                    maybe_print_stack() 
+                    log_warn("Cleanup call to %s failed." 
+                         % (script + args))
+        except IOError,e:
+            maybe_print_stack()
+            log_warn("Unable to read cleanup handler for %s" % name)
+        except Exception,e:
+            maybe_print_stack()
+            log_warn("Exception during cleanup handler for %s" % name)
+
+
+def load_overrides(cleanup_stack): 
     if CONFIG_OVERRIDES: 
         try:
             twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
         except Exception, e:
-            handle_exception('ERROR in global configuration', e)
+            handle_exception('Error in global configuration', e, cleanup_stack)
 
-def run_script(script_data): 
-    twill.execute_string(script_data, no_reset=1)
-
-def run_tests(calls): 
-    for name,args in calls: 
-        run_test(name,args)
-
-def run_test(name,args): 
-    try:
-        suite_data = read_suite(name)
-        print "* running suite: %s" % name 
-
-        calls = parse_suite(suite_data)
-        
+def load_configuration(name, cleanup_stack): 
+    if file_exists(name,CONFIGURATION):
         try: 
             configuration = read_configuration(name)
-            run_script(configuration)
-            print "* loaded configuration: %s" % (name + CONFIGURATION)
-        except IOError: 
-            print "! Warning: unable to locate configuration for suite %s" % (name + SUITE)
+            twill.execute_string(configuration, no_reset=1)
+            log_info("loaded configuration: %s" % (name + CONFIGURATION))
+        except IOError,e: 
+            handle_exception("Unable to read configuration for suite %s" \
+                             % (name + SUITE), e, cleanup_stack )
         except Exception,e:
-            handle_exception("Invalid configuration: '%s'" % (name + CONFIGURATION), e)
-        
-        run_tests(calls)
-        return
+            handle_exception("Invalid configuration: '%s'" \
+                             % (name + CONFIGURATION), e, cleanup_stack)
+    else:
+        log_warn("Unable to locate configuration for suite %s" 
+             % (name + SUITE))
 
-    except IOError: 
-        # not a suite, try a test
-        pass
+def run_suite(name, cleanup_stack):
+    log_info("running suite: %s" % name)
+    suite_data = read_suite(name)
+    calls = parse_suite(suite_data)
+    
+    # reset browser before executing new suite 
+    twill.commands.reset_browser()
 
-    do_overrides()
+    load_configuration(name, cleanup_stack)
+    cleanup_stack.append(name)
+    run_tests(calls,cleanup_stack)
+    do_cleanup_for(name)
+    cleanup_stack.pop()
+    
+    return
+
+def run_tests(calls, cleanup_stack): 
+    for name,args in calls: 
+        run_test(name, args, cleanup_stack)
+
+def run_test(name,args, cleanup_stack): 
+    if file_exists(name, SUITE):
+        if args:
+            log_warn("Arguments provided to suites are ignored! [%s%s]" 
+                 % (name,args))
+        run_suite(name,cleanup_stack)
+    elif file_exists(name, TEST): 
+        load_overrides(cleanup_stack)
         
-    try:
-        print "* running test: %s" % name
-        script = read_test(name)
-        script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
-        run_script(script)
-    except IOError, e: 
-        # reraise with more specific message
-        try: 
-            raise IOError("Unable to locate '%s' or '%s' in search path" % (name + SUITE, 
-                                                                            name + TEST))
+        try:
+            log_info("running test: %s" % name)
+            script = read_test(name)
+            script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
+            twill.execute_string(script, no_reset=1)
         except IOError, e: 
-            handle_exception("ERROR", e)
-                          
+            handle_exception("Unable to read test '%s'" % (name + TEST), e,
+                             cleanup_stack)
+    else:
+        raise NameError("Unable to locate %s or %s in search path",
+                        (name + TEST, name + SUITE))
 
-    except Exception, e:
-        handle_exception("ERROR : %s" % name, e)
+
+def log_error(msg):
+    print "[X] Error:", msg 
+
+def log_warn(msg):
+    print "[!] Warning:", msg 
+
+def log_info(msg):
+    print "[*]", msg 
+
+
+def die(message, parser=None): 
+    print message 
+    if parser is not None:
+        parser.print_usage()
+    sys.exit(0)
 
 def main(argv=None):
     if argv is None:
@@ -261,7 +337,7 @@ def main(argv=None):
 
     scheme, uri = urllib.splittype(options.base_url)
     if scheme is None: 
-        print "! Warning: no scheme specified in test url, assuming http"
+        warn("no scheme specified in test url, assuming http")
         options.base_url = "http://" + options.base_url 
     elif not scheme == 'http' and not scheme == 'https':
         die("unsupported scheme '%s' in '%s'" % (scheme,options.base_url))
@@ -284,9 +360,14 @@ def main(argv=None):
         except IOError, msg: 
             die(msg)
 
-    run_tests(map(parse_test_call,args[1:])) 
-
-    print 'All Tests Passed!'
+    cleanup_stack = []
+    try:
+        run_tests(map(parse_test_call,args[1:]),cleanup_stack)
+    except Exception, e:
+        handle_exception("ERROR",e,cleanup_stack)
+    else:
+        assert len(cleanup_stack) == 0 
+        print 'All Tests Passed!'
  
 
 if __name__ == '__main__':
