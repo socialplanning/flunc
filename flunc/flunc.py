@@ -268,7 +268,7 @@ def run_test(name,args):
             handle_exception("Error running %s" % name, e)
             return [name]
     else:
-        raise NameError("Unable to locate %s or %s in search path",
+        raise NameError("Unable to locate %s or %s in search path" %
                         (name + TEST, name + SUITE))
 
 def log_error(msg):
