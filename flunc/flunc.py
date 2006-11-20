@@ -159,13 +159,26 @@ def handle_exception(msg, e):
         log_error("%s (%s)" % (msg,e.args[0]))
     else:
         log_error(msg)
+
+    if options.show_error_in_browser:
+        try:
+            log_info("Launching web browser...")
+            import webbrowser
+            path = os.path.abspath(options.dump_file)
+            webbrowser.open('file://' + path)            
+        except: 
+            maybe_print_stack()
+            log_error("Unable to open current HTML in webbrowser")
+        
+
     if options.interactive:
         try: 
             do_twill_repl()
         except Exception:
             pass 
-
-    sys.exit(1)
+                
+    if not options.ignore_failures: 
+        sys.exit(1)
 
 
 def do_cleanup_for(name):
@@ -217,12 +230,16 @@ def load_configuration(name):
 
 def run_suite(name):
     try: 
-        log_info("running suite: %s" % name)
-        suite_data = read_suite(name)
-        calls = parse_suite(suite_data)
+        try:
+            log_info("running suite: %s" % name)
+            suite_data = read_suite(name)
+            calls = parse_suite(suite_data)
         
-        load_configuration(name)
-        run_tests(calls)
+            load_configuration(name)
+            run_tests(calls)
+        except IOError,e: 
+            handle_exception("Unable to read suite %s" % name,e)
+
     finally: 
         do_cleanup_for(name)
 
@@ -248,6 +265,8 @@ def run_test(name,args):
             twill.execute_string(script, no_reset=1)
         except IOError, e: 
             handle_exception("Unable to read test '%s'" % (name + TEST), e)
+        except Exception, e: 
+            handle_exception("Error running %s" % name, e)
     else:
         raise NameError("Unable to locate %s or %s in search path",
                         (name + TEST, name + SUITE))
@@ -307,9 +326,23 @@ def main(argv=None):
                       dest='interactive',
                       action='store_true',
                       help="Fall into twill shell on error")
+    parser.add_option('-F', '--ignore-failures',
+                      dest='ignore_failures',
+                      action='store_true',
+                      help="continue running tests after failures")
     parser.add_option('-d', '--dump-html',
                       dest='dump_file',
                       help="dump current HTML to file specified on error. specify - for stdout.")
+    parser.add_option('-w', '--show-error-in-browser', 
+                      dest='show_error_in_browser', 
+                      action='store_true',
+                      help="show dumped HTML in a web browser on error, forces interactive mode")
+    parser.add_option('-b','--browser',
+                      dest='browser',
+                      default='firefox', 
+                      help="specifies web browser to use when viewing error pages [default: %default]")
+
+
 
     global options 
     options, args = parser.parse_args(argv)
@@ -324,6 +357,14 @@ def main(argv=None):
     if len(args) < 2: 
         die("No tests specified", parser)
 
+    if options.show_error_in_browser:
+        if not options.dump_file:
+            die("Must specify dump file when requesting browser launch",parser)
+        options.interactive = True
+
+    if options.browser: 
+        os.environ['BROWSER'] = options.browser
+
     scheme, uri = urllib.splittype(options.base_url)
     if scheme is None: 
         warn("no scheme specified in test url, assuming http")
@@ -333,6 +374,8 @@ def main(argv=None):
     
 
     host, path = urllib.splithost(uri)
+
+
    
     print "* Running against %s, host: %s path=%s" % \
         (options.base_url,host,path)
