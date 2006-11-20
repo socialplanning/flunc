@@ -236,15 +236,15 @@ def run_suite(name):
             calls = parse_suite(suite_data)
         
             load_configuration(name)
-            return run_tests(calls)
+            return [name + "::" + x for x in run_tests(calls) if x]
         except IOError,e: 
             handle_exception("Unable to read suite %s" % name,e)
-            return 1
+            return [name]
     finally: 
         do_cleanup_for(name)
 
 def run_tests(calls): 
-    return sum(run_test(name, args) for name, args in calls)
+    return sum([run_test(name, args) for name, args in calls], [])
 
 def run_test(name,args): 
     if file_exists(name, SUITE):
@@ -260,13 +260,13 @@ def run_test(name,args):
             script = read_test(name)
             script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
             twill.execute_string(script, no_reset=1)
-            return 0
+            return ['']
         except IOError, e: 
             handle_exception("Unable to read test '%s'" % (name + TEST), e)
-            return 1
+            return [name]
         except Exception, e: 
             handle_exception("Error running %s" % name, e)
-            return 1
+            return [name]
     else:
         raise NameError("Unable to locate %s or %s in search path",
                         (name + TEST, name + SUITE))
@@ -387,14 +387,16 @@ def main(argv=None):
             die(msg)
 
     try:
-        nerrors = run_tests(map(parse_test_call,args[1:]))
+        error_tests = filter(None, run_tests(map(parse_test_call,args[1:])))
     except Exception, e:
         handle_exception("ERROR",e)
     else:
+        nerrors = len(error_tests)
         if nerrors == 0:
             log_info('All Tests Passed!')
         else:
             log_info('%d Errors Found' % nerrors)
+            log_info('Failing Tests:\n%s' % '\n'.join(error_tests))
 
 
 if __name__ == '__main__':
