@@ -119,9 +119,15 @@ def read_cleanup_for(name):
     return read_file_type(name + CLEANUP, SUITE)
 
 def parse_suite(suite_data): 
-    valid_line = lambda line: line.strip() and\
-                              not line.lstrip().startswith('#')
-    return map(parse_test_call,filter(valid_line, suite_data.splitlines()))
+    lineno = 0 
+    calls = [] 
+    for line in suite_data.splitlines(): 
+        lineno = lineno + 1
+        if not line.strip() or line.lstrip().startswith('#'):
+            continue
+        calls.append(parse_test_call(line) + (lineno,))
+
+    return calls 
 
 def maybe_print_stack(): 
     if options.verbose:
@@ -187,16 +193,19 @@ def do_cleanup_for(name):
         try:
             suite_data = read_cleanup_for(name)
             calls = parse_suite(suite_data)
-            for script,args in calls:
+            for script,args,line in calls:
                 try:
                     if file_exists(script,SUITE):
-                        log_warn("Cannot call sub-suite %s during cleanup." % name)
+                        log_warn("Cannot call sub-suite %s during cleanup at %s(%d)" % (script,name,line))
                     else:
-                        run_test(script,args)
+                        log_info("running cleanup: %s" % name)
+                        script_data = read_test(script)
+                        script_data = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script_data 
+                        twill.execute_string(script_data, no_reset=1)
                 except Exception, e:
                     maybe_print_stack() 
-                    log_warn("Cleanup call to %s failed." 
-                         % (script + args))
+                    log_warn("Cleanup call to %s failed at %s(%d)" 
+                         % (script + args, name + CLEANUP, line))
         except IOError,e:
             maybe_print_stack()
             log_warn("Unable to read cleanup handler for %s" % name)
@@ -236,15 +245,17 @@ def run_suite(name):
             calls = parse_suite(suite_data)
         
             load_configuration(name)
-            return [name + "::" + x for x in run_tests(calls) if x]
+            error_list = [] 
+            for script,args,line in calls: 
+                errors = run_test(script,args)
+                if len(errors):                     
+                    error_list += [name + "(%d)::%s" % (line,x) for x in errors if x]
+            return error_list
         except IOError,e: 
             handle_exception("Unable to read suite %s" % name,e)
             return [name]
     finally: 
         do_cleanup_for(name)
-
-def run_tests(calls): 
-    return sum([run_test(name, args) for name, args in calls], [])
 
 def run_test(name,args): 
     if file_exists(name, SUITE):
@@ -260,7 +271,7 @@ def run_test(name,args):
             script = read_test(name)
             script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
             twill.execute_string(script, no_reset=1)
-            return ['']
+            return []
         except IOError, e: 
             handle_exception("Unable to read test '%s'" % (name + TEST), e)
             return [name]
@@ -387,7 +398,10 @@ def main(argv=None):
             die(msg)
 
     try:
-        error_tests = filter(None, run_tests(map(parse_test_call,args[1:])))
+        error_tests = [] 
+        calls = map(parse_test_call,args[1:])
+        for name,args in calls: 
+            error_tests += run_test(name,args)
     except Exception, e:
         handle_exception("ERROR",e)
     else:
