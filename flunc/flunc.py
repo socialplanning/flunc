@@ -141,7 +141,7 @@ def do_twill_repl():
         except SystemExit:
             raise
 
-def handle_exception(msg, e, cleanup_stack):
+def handle_exception(msg, e):
     maybe_print_stack()
     
     if options.dump_file:
@@ -165,15 +165,8 @@ def handle_exception(msg, e, cleanup_stack):
         except Exception:
             pass 
 
-
-    do_cleanup(cleanup_stack)
-
     sys.exit(1)
 
-
-def do_cleanup(cleanup_stack): 
-    while len(cleanup_stack):
-        do_cleanup_for(cleanup_stack.pop())
 
 def do_cleanup_for(name):
     if has_cleanup_handler(name): 
@@ -186,7 +179,7 @@ def do_cleanup_for(name):
                     if file_exists(script,SUITE):
                         log_warn("Cannot call sub-suite %s during cleanup." % name)
                     else:
-                        run_test(script,args,[])
+                        run_test(script,args)
                 except Exception, e:
                     maybe_print_stack() 
                     log_warn("Cleanup call to %s failed." 
@@ -199,14 +192,14 @@ def do_cleanup_for(name):
             log_warn("Exception during cleanup handler for %s" % name)
 
 
-def load_overrides(cleanup_stack): 
+def load_overrides(): 
     if CONFIG_OVERRIDES: 
         try:
             twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
         except Exception, e:
-            handle_exception('Error in global configuration', e, cleanup_stack)
+            handle_exception('Error in global configuration', e)
 
-def load_configuration(name, cleanup_stack): 
+def load_configuration(name): 
     if file_exists(name,CONFIGURATION):
         try: 
             configuration = read_configuration(name)
@@ -214,42 +207,39 @@ def load_configuration(name, cleanup_stack):
             log_info("loaded configuration: %s" % (name + CONFIGURATION))
         except IOError,e: 
             handle_exception("Unable to read configuration for suite %s" \
-                             % (name + SUITE), e, cleanup_stack )
+                             % (name + SUITE), e)
         except Exception,e:
             handle_exception("Invalid configuration: '%s'" \
-                             % (name + CONFIGURATION), e, cleanup_stack)
+                             % (name + CONFIGURATION), e)
     else:
         log_warn("Unable to locate configuration for suite %s" 
              % (name + SUITE))
 
-def run_suite(name, cleanup_stack):
-    log_info("running suite: %s" % name)
-    suite_data = read_suite(name)
-    calls = parse_suite(suite_data)
-    
-    # reset browser before executing new suite 
-    twill.commands.reset_browser()
+def run_suite(name):
+    try: 
+        log_info("running suite: %s" % name)
+        suite_data = read_suite(name)
+        calls = parse_suite(suite_data)
+        
+        load_configuration(name)
+        run_tests(calls)
+    finally: 
+        do_cleanup_for(name)
 
-    load_configuration(name, cleanup_stack)
-    cleanup_stack.append(name)
-    run_tests(calls,cleanup_stack)
-    do_cleanup_for(name)
-    cleanup_stack.pop()
-    
-    return
+        
 
-def run_tests(calls, cleanup_stack): 
+def run_tests(calls): 
     for name,args in calls: 
-        run_test(name, args, cleanup_stack)
+        run_test(name, args)
 
-def run_test(name,args, cleanup_stack): 
+def run_test(name,args): 
     if file_exists(name, SUITE):
         if args:
             log_warn("Arguments provided to suites are ignored! [%s%s]" 
                  % (name,args))
-        run_suite(name,cleanup_stack)
+        run_suite(name)
     elif file_exists(name, TEST): 
-        load_overrides(cleanup_stack)
+        load_overrides()
         
         try:
             log_info("running test: %s" % name)
@@ -257,8 +247,7 @@ def run_test(name,args, cleanup_stack):
             script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
             twill.execute_string(script, no_reset=1)
         except IOError, e: 
-            handle_exception("Unable to read test '%s'" % (name + TEST), e,
-                             cleanup_stack)
+            handle_exception("Unable to read test '%s'" % (name + TEST), e)
     else:
         raise NameError("Unable to locate %s or %s in search path",
                         (name + TEST, name + SUITE))
@@ -360,13 +349,11 @@ def main(argv=None):
         except IOError, msg: 
             die(msg)
 
-    cleanup_stack = []
     try:
-        run_tests(map(parse_test_call,args[1:]),cleanup_stack)
+        run_tests(map(parse_test_call,args[1:]))
     except Exception, e:
-        handle_exception("ERROR",e,cleanup_stack)
+        handle_exception("ERROR",e)
     else:
-        assert len(cleanup_stack) == 0 
         print 'All Tests Passed!'
  
 
