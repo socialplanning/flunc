@@ -236,25 +236,22 @@ def run_suite(name):
             calls = parse_suite(suite_data)
         
             load_configuration(name)
-            run_tests(calls)
+            return run_tests(calls)
         except IOError,e: 
             handle_exception("Unable to read suite %s" % name,e)
-
+            return 1
     finally: 
         do_cleanup_for(name)
 
-        
-
 def run_tests(calls): 
-    for name,args in calls: 
-        run_test(name, args)
+    return sum(run_test(name, args) for name, args in calls)
 
 def run_test(name,args): 
     if file_exists(name, SUITE):
         if args:
             log_warn("Arguments provided to suites are ignored! [%s%s]" 
                  % (name,args))
-        run_suite(name)
+        return run_suite(name)
     elif file_exists(name, TEST): 
         load_overrides()
         
@@ -263,14 +260,16 @@ def run_test(name,args):
             script = read_test(name)
             script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
             twill.execute_string(script, no_reset=1)
+            return 0
         except IOError, e: 
             handle_exception("Unable to read test '%s'" % (name + TEST), e)
+            return 1
         except Exception, e: 
             handle_exception("Error running %s" % name, e)
+            return 1
     else:
         raise NameError("Unable to locate %s or %s in search path",
                         (name + TEST, name + SUITE))
-
 
 def log_error(msg):
     print "[X] Error:", msg 
@@ -280,7 +279,6 @@ def log_warn(msg):
 
 def log_info(msg):
     print "[*]", msg 
-
 
 def die(message, parser=None): 
     print message 
@@ -372,11 +370,8 @@ def main(argv=None):
     elif not scheme == 'http' and not scheme == 'https':
         die("unsupported scheme '%s' in '%s'" % (scheme,options.base_url))
     
-
     host, path = urllib.splithost(uri)
 
-
-   
     print "* Running against %s, host: %s path=%s" % \
         (options.base_url,host,path)
     # define utility variables to help point scripts at desired location
@@ -384,7 +379,6 @@ def main(argv=None):
     define_twill_vars(base_host=host)
     define_twill_vars(base_path=path)
     
-
     if options.config_file: 
         try: 
             global CONFIG_OVERRIDES 
@@ -393,13 +387,15 @@ def main(argv=None):
             die(msg)
 
     try:
-        run_tests(map(parse_test_call,args[1:]))
+        nerrors = run_tests(map(parse_test_call,args[1:]))
     except Exception, e:
         handle_exception("ERROR",e)
     else:
-        print 'All Tests Passed!'
- 
+        if nerrors == 0:
+            log_info('All Tests Passed!')
+        else:
+            log_info('%d Errors Found' % nerrors)
+
 
 if __name__ == '__main__':
     main(sys.argv)
-
