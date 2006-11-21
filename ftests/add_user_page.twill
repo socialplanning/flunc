@@ -1,0 +1,7 @@
+follow 'My Home'
+follow '\+'
+find 'has been created'
+find 'Edit Page'
+find 'Title'
+find 'Description'
+find 'Body text'
