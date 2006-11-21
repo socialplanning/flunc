@@ -1,0 +1,4 @@
+# test suite to illustrate open plans failures
+create_user
+login
+edit_user_home_page
