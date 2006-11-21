@@ -1,0 +1,2 @@
+# cleans up artifacts of the failing test suite
+destroy_user
