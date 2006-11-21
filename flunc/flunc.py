@@ -402,6 +402,8 @@ def main(argv=None):
         calls = map(parse_test_call,args[1:])
         for name,args in calls: 
             error_tests += run_test(name,args)
+    except SystemExit:
+        raise
     except Exception, e:
         handle_exception("ERROR",e)
     else:
