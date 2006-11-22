@@ -16,7 +16,7 @@ follow $projname
 follow "Edit"
 fv edit_form title $projtitle
 fv edit_form description $projdesc
-fv edit_form text $projbody
+fv edit_form text ${projbody}${pagelink}
 submit form_submit
 find $projtitle
 find $projdesc

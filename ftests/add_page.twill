@@ -1,0 +1,25 @@
+#
+# follow the 'new page' link to add a page, edit that page, follow
+# a link back to the project home
+#
+# projname - the id of the project 
+# anotherdesc - description of a second page
+# anotherbody - body of another page (contains wicked link back to 
+#               project home page)
+# 
+# expects: 
+#    project exists
+#
+
+
+go ${base_url}/projects/${projname}
+follow "@@wickedadd"
+find "has been created"
+fv edit_form description $anotherdesc
+fv edit_form text ${anotherbody}${homelink}
+submit form_submit
+find "new page"
+find $anotherdesc
+find $anotherbody
+follow $projtitle
+find $projname
