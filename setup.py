@@ -19,7 +19,9 @@ setup(name="flunc",
       zip_safe=False,
       install_requires=[
         'twill',
-        'TestGen4Web-Python',
+      ],
+      dependency_links=[
+        'http://darcs.idyll.org/~t/projects/',
       ],
       include_package_data=True,
       entry_points="""
