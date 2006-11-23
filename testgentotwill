@@ -1,6 +1,0 @@
-#!/bin/sh
-
-[ $# -lt 1 ] && echo 'specify xml testgen to convert' && exit 1
-
-testgen-convert twill-shell code $1
-
