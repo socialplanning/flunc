@@ -311,7 +311,7 @@ def main(argv=None):
     parser.add_option('-t', '--host',
                       help='specifies the base url of the portal to test [default: %default]',
                       dest='base_url',
-                      default='http://localhost:8080/portal')
+                      default='http://localhost:8080/openplans')
     parser.add_option('-c', '--config',
                       help='specifies file with configuration overrides',
                       dest='config_file')
