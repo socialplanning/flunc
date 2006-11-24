@@ -1,7 +1,4 @@
 follow 'My Home'
-follow '\+'
-find 'has been created'
-find 'Edit Page'
-find 'Title'
-find 'Description'
-find 'Body text'
+follow "new page"
+find "This item does not have any body text, click the edit tab to change it."
+
