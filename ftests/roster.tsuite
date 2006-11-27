@@ -1,0 +1,15 @@
+# tests that a user is added / removed from roster featurelet properly 
+
+# create a coulple of users 
+create_user(user=${u1_name}, fullname=${u1_fullname})
+create_user(user=${u2_name}, fullname=${u2_fullname})
+
+# u1 creates a project 
+login(user=${u1_name})
+create_project
+enable_roster
+user_in_roster(user=${u1_name})
+user_not_in_roster(user=${u2_name})
+add_project_member(membername=${u2_name})
+user_in_roster(user=${u2_name})
+logout 
