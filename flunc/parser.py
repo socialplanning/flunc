@@ -34,7 +34,7 @@ def make_twill_local_defs(vars):
 # foo(user=${new_user})
 # foo # optionally with comments
 test_call_sep = re.compile("^\s*([^(\s]+)(\([^)]*?\))\s*(?:#.*)?$")
-test_non_call = re.compile("^\s*[A-Za-z_.-]+\s*$")
+test_non_call = re.compile("^\s*([A-Za-z_.-]+)\s*(?:#.*)?$")
 
 def parse_test_call(callstr): 
     match = test_call_sep.search(callstr)
@@ -43,6 +43,6 @@ def parse_test_call(callstr):
         if not match:
             raise ValueError("Invalid test name: '%s'" % callstr)
         else:
-            return (callstr.strip(), '')
+            return (match.group(1), '')
     
     return match.groups()
