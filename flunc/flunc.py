@@ -188,7 +188,7 @@ def handle_exception(msg, e):
 
 
 def do_cleanup_for(name):
-    if has_cleanup_handler(name): 
+    if has_cleanup_handler(name) and not options.no_cleanup_mode: 
         log_info("running cleanup handler for %s" % name)
         try:
             suite_data = read_cleanup_for(name)
@@ -348,6 +348,10 @@ def main(argv=None):
                       dest='cleanup_mode',
                       action='store_true',
                       help="Only run cleanup handlers for suites given.")
+    parser.add_option('-X', '--no-cleanup',
+                      dest='no_cleanup_mode',
+                      action='store_true',
+                      help="Do not run cleanup handlers.")
     parser.add_option('-F', '--ignore-failures',
                       dest='ignore_failures',
                       action='store_true',
@@ -378,6 +382,9 @@ def main(argv=None):
 
     if len(args) < 2: 
         die("No tests specified", parser)
+
+    if options.cleanup_mode and options.no_cleanup_mode:
+        die("Conflicting options specified, only one of cleanup-mode, no-cleanup-mode may be specified.",parser)
 
     if options.show_error_in_browser:
         if not options.dump_file:
