@@ -240,16 +240,22 @@ def load_configuration(name):
 def run_suite(name):
     try: 
         try:
-            log_info("running suite: %s" % name)
+            if not options.cleanup_mode:
+                log_info("running suite: %s" % name)
+        
             suite_data = read_suite(name)
             calls = parse_suite(suite_data)
         
             load_configuration(name)
+            load_overrides() 
+
             error_list = [] 
-            for script,args,line in calls: 
-                errors = run_test(script,args)
-                if len(errors):                     
-                    error_list += [name + "(%d)::%s" % (line,x) for x in errors if x]
+            # skip running suites if cleanup-only mode is set 
+            if not options.cleanup_mode:
+                for script,args,line in calls: 
+                    errors = run_test(script,args)
+                    if len(errors):                     
+                        error_list += [name + "(%d)::%s" % (line,x) for x in errors if x]
             return error_list
         except IOError,e: 
             handle_exception("Unable to read suite %s" % name,e)
@@ -264,9 +270,12 @@ def run_test(name,args):
                  % (name,args))
         return run_suite(name)
     elif file_exists(name, TEST): 
-        load_overrides()
-        
-        try:
+
+        # don't do anything in cleanup only mode 
+        if options.cleanup_mode:
+            return []
+
+        try:            
             log_info("running test: %s" % name)
             script = read_test(name)
             script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
@@ -335,6 +344,10 @@ def main(argv=None):
                       dest='interactive',
                       action='store_true',
                       help="Fall into twill shell on error")
+    parser.add_option('-C', '--cleanup-only',
+                      dest='cleanup_mode',
+                      action='store_true',
+                      help="Only run cleanup handlers for suites given.")
     parser.add_option('-F', '--ignore-failures',
                       dest='ignore_failures',
                       action='store_true',
@@ -383,8 +396,8 @@ def main(argv=None):
     
     host, path = urllib.splithost(uri)
 
-    print "* Running against %s, host: %s path=%s" % \
-        (options.base_url,host,path)
+    log_info("Running against %s, host: %s path=%s" % \
+        (options.base_url,host,path))
     # define utility variables to help point scripts at desired location
     define_twill_vars(base_url=options.base_url)
     define_twill_vars(base_host=host)
@@ -397,10 +410,14 @@ def main(argv=None):
         except IOError, msg: 
             die(msg)
 
+    if options.cleanup_mode:
+        log_info("Running in Cleanup-Only mode")
+
     try:
         error_tests = [] 
         calls = map(parse_test_call,args[1:])
         for name,args in calls: 
+            load_overrides()
             error_tests += run_test(name,args)
     except SystemExit:
         raise
@@ -408,7 +425,9 @@ def main(argv=None):
         handle_exception("ERROR",e)
     else:
         nerrors = len(error_tests)
-        if nerrors == 0:
+        if options.cleanup_mode:
+            log_info('Cleanup Complete.')
+        elif nerrors == 0:
             log_info('All Tests Passed!')
         else:
             log_info('%d Errors Found' % nerrors)
