@@ -1,4 +1,5 @@
 follow 'My Home'
 follow "new page"
-find "This item does not have any body text, click the edit tab to change it."
+find "\"new page\" has been created"
+find "Edit\s*Page" s
 
