@@ -12,4 +12,6 @@ user_in_roster(user=${u1_name})
 user_not_in_roster(user=${u2_name})
 add_project_member(membername=${u2_name})
 user_in_roster(user=${u2_name})
+remove_project_member(membername=${u2_name})
+user_not_in_roster(user=${u2_name})
 logout 
