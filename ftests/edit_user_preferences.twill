@@ -11,7 +11,8 @@
 
 
 go ${base_url}
-follow "My Info"
+follow $user 
+follow "My Preferences"
 find "Edit Personal Info and Preferences"
 find $fullname
 find $email
