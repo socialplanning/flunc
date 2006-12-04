@@ -149,17 +149,16 @@ def do_twill_repl():
 
 def handle_exception(msg, e):
     maybe_print_stack()
-    
-    if options.dump_file:
-        html = twill.get_browser().get_html()
-        if options.dump_file == '-':
-            print html
-        else:
-            try:
-                open(options.dump_file, 'w').write(html)
-                log_info("saved html to: %s" % options.dump_file)
-            except IOError, e:
-                log_warn("Unable to save to: %s" % options.dump_file)
+
+    html = twill.get_browser().get_html()
+    if options.dump_file == '-':
+        print html
+    else:
+        try:
+            open(options.dump_file, 'w').write(html)
+            log_info("saved html to: %s" % options.dump_file)
+        except IOError, e:
+            log_warn("Unable to save to: %s" % options.dump_file)
 
     if e.args:
         log_error("%s (%s)" % (msg,e.args[0]))
@@ -358,6 +357,7 @@ def main(argv=None):
                       help="continue running tests after failures")
     parser.add_option('-d', '--dump-html',
                       dest='dump_file',
+                      default='err.html',
                       help="dump current HTML to file specified on error. specify - for stdout.")
     parser.add_option('-w', '--show-error-in-browser', 
                       dest='show_error_in_browser', 
@@ -386,9 +386,8 @@ def main(argv=None):
     if options.cleanup_mode and options.no_cleanup_mode:
         die("Conflicting options specified, only one of cleanup-mode, no-cleanup-mode may be specified.",parser)
 
+    # showing an error in the browser implies interactive mode
     if options.show_error_in_browser:
-        if not options.dump_file:
-            die("Must specify dump file when requesting browser launch",parser)
         options.interactive = True
 
     if options.browser: 
