@@ -13,7 +13,7 @@
 
 go ${base_url}/projects
 follow $projname
-follow "Versions"
+follow "History"
 follow "rollbackversion\?version_id=${version}"
 find "has been rolled back to version ${version}"
 find $expected
