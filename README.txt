@@ -23,7 +23,8 @@ change this with the -p (--path) option
 
 flunc all 
 
-[runs all tests listed in all.tsuite against localhost:8080/portal]
+[runs all tests listed in all.tsuite against localhost:8080/openplans]
+
 
 flunc -t http://localhost:8080/some_portal all 
 [runs all tests listed in all.tsuite against localhost:8080/some_portal]
