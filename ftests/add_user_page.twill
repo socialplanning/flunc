@@ -1,5 +1,4 @@
 follow 'My Home'
-follow "new page"
-find "\"new page\" has been created"
-find "Edit\s*Page" s
 
+follow "@@wickedadd"
+find "\"new page\" has been created"
