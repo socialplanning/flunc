@@ -14,7 +14,6 @@ fv edit_form text "((${pagename}))"
 submit form_submit
 follow ${pagename}
 find "\"${pagename}\" has been created"
-find "Edit\s*Page" s
 find ${pagename}
 fv edit_form text "This is the new page $pagename."
 submit form_submit 
