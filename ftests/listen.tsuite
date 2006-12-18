@@ -1,0 +1,5 @@
+# tests to make sure basic listen functionality is working
+
+login(user=${admin}, password=${adminpw})
+listen_create_list
+logout
