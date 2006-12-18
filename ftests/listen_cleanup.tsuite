@@ -1,0 +1,2 @@
+login(user=${admin}, password=${adminpw})
+destroy_listen

@@ -1,0 +1,11 @@
+#
+# create an isolated mailing list
+#
+go ${base_url}
+follow ${listtype}
+fv 2 form.title ${list_name}
+fv 2 form.description ${listdesc}
+fv 2 form.mailto ${mailto}
+fv 2 form.list_owner ${listowner}
+fv 2 form.archived ${attach}
+submit Save
