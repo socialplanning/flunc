@@ -3,3 +3,16 @@
 login(user=${admin}, password=${adminpw})
 listen_create_list
 logout
+create_user
+login
+listen_subscribe
+listen_unsubscribe
+listen_subscribe
+listen_stopmail
+listen_startmail
+
+logout
+login(user=${admin}, password=${adminpw})
+listen_managemembership
+
+logout
