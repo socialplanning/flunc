@@ -2,7 +2,7 @@
 create_user
 login
 create_project
-edit_project(projbody=${projbody})
+edit_project(projbody=${projbody1})
 edit_project(projbody=${projbody2})
 edit_project(projbody=${projbody3})
 rollback(version="1",expected=${projbody2})
