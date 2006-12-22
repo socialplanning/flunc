@@ -34,12 +34,16 @@ def read_file_type(name, ext):
 def file_exists(name,ext):
     return name_lookup.has_key(name + ext)
 
-def scan_for_tests(root): 
+def scan_for_tests(root, recursive=False): 
     """
-    recursively scans for relevant files in the directory given
+    scans for relevant files in the directory given.
     """
     log_info("scanning for tests in '%s'" % root)
     found = {} 
+
+    if not os.path.isdir(root):
+    	log_warn("Test directory not found (%s). Use -p to specify test search path" % root)
+	return found 
 
     def check_files(files):
         for filename in files: 
@@ -52,7 +56,7 @@ def scan_for_tests(root):
                     found[filename] = os.path.join(root, filename)
                     
 
-    if options.recursive:
+    if recursive:
         # XXX this is DFS, it probably should do BFS ? 
         for root, dirs, files in os.walk(root): 
             check_files(files)
@@ -378,7 +382,7 @@ def main(argv=None):
     options, args = parser.parse_args(argv)
 
     global name_lookup 
-    name_lookup = scan_for_tests(options.search_path)
+    name_lookup = scan_for_tests(options.search_path, options.recursive)
 
     if options.list_suites:
         list_suites()
