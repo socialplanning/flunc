@@ -366,7 +366,7 @@ def main(argv=None):
     parser.add_option('-d', '--dump-html',
                       dest='dump_file',
                       default='err.html',
-                      help="dump current HTML to file specified on error. specify - for stdout.")
+                      help="set file to dump HTML to when an error is encountered.  specify - for stdout. [default: %default]")
     parser.add_option('-w', '--show-error-in-browser', 
                       dest='show_error_in_browser', 
                       action='store_true',
