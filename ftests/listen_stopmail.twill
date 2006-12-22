@@ -1,9 +1,0 @@
-#
-# stop receiving mail
-#
-
-go ${base_url}/${list_name}
-find "You are currently receiving messages"
-fv recvmail-form stop_recvmail "stop mail"
-submit
-find "You are not currently receiving messages"

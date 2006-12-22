@@ -1,4 +1,0 @@
-destroy_user
-login(user=${admin}, password=${adminpw})
-destroy_listen
-logout

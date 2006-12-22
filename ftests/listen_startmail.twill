@@ -1,9 +1,0 @@
-#
-# start receiving mail
-#
-
-go ${base_url}/${list_name}
-find "You are not currently receiving messages"
-fv recvmail-form start_recvmail "start mail"
-submit
-find "You are currently receiving messages"
