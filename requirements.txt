@@ -1,2 +1,2 @@
--f .#egg=flunc_tester
--e flunc_tester
+-f .#egg=flunc
+-e flunc
