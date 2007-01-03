@@ -7,6 +7,7 @@ import twill
 from twill.namespaces import get_twill_glocals
 
 from parser import parse_test_call, make_dict_from_call, make_twill_local_defs
+from logging import log_info, log_warn, log_error 
 
 from cleanurl_handler import CleanURLRedirectHandler
 twill.get_browser()._browser._replace_handler("_redirect", CleanURLRedirectHandler())
@@ -162,11 +163,13 @@ def handle_exception(msg, e):
     if options.dump_file == '-':
         print html
     else:
+        dump_file_name = os.path.expanduser(options.dump_file)
+            
         try:
-            open(options.dump_file, 'w').write(html)
-            log_info("saved html to: %s" % options.dump_file)
+            open(dump_file_name, 'w').write(html)
+            log_info("saved error html to: %s" % dump_file_name)
         except IOError, e:
-            log_warn("Unable to save to: %s" % options.dump_file)
+            log_warn("Unable to save error HTML to: %s" % dump_file_name)
 
     if e.args:
         log_error("%s (%s)" % (msg,e.args[0]))
@@ -174,14 +177,17 @@ def handle_exception(msg, e):
         log_error(msg)
 
     if options.show_error_in_browser:
-        try:
-            log_info("Launching web browser...")
-            import webbrowser
-            path = os.path.abspath(options.dump_file)
-            webbrowser.open('file://' + path)            
-        except: 
-            maybe_print_stack()
-            log_error("Unable to open current HTML in webbrowser")
+        if options.dump_file == '-': 
+            log_warning("Web browser view is not supported when dumping error html to standard out.")
+        else:
+            try:
+                log_info("Launching web browser...")
+                import webbrowser
+                path = os.path.abspath(os.path.expanduser(options.dump_file))
+                webbrowser.open('file://' + path)            
+            except: 
+                maybe_print_stack()
+                log_error("Unable to open current HTML in webbrowser")
         
 
     if options.interactive:
@@ -298,14 +304,6 @@ def run_test(name,args):
         raise NameError("Unable to locate %s or %s in search path" %
                         (name + TEST, name + SUITE))
 
-def log_error(msg):
-    print "[X] Error:", msg 
-
-def log_warn(msg):
-    print "[!] Warning:", msg 
-
-def log_info(msg):
-    print "[*]", msg 
 
 def die(message, parser=None): 
     print message 
@@ -322,6 +320,9 @@ def main(argv=None):
     if not ftest_dir.startswith(os.path.sep):
         # Suppress optparse's word wrapping:
         ftest_dir = '.'+os.path.sep+ftest_dir
+
+
+
     usage = "usage: %prog [options] <test name> [test name...]"
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('-t', '--host',
@@ -382,7 +383,7 @@ def main(argv=None):
     options, args = parser.parse_args(argv)
 
     global name_lookup 
-    name_lookup = scan_for_tests(options.search_path, options.recursive)
+    name_lookup = scan_for_tests(os.path.expanduser(options.search_path), options.recursive)
 
     if options.list_suites:
         list_suites()
