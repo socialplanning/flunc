@@ -19,6 +19,7 @@ setup(name="flunc",
       zip_safe=False,
       install_requires=[
         'twill',
+	'mechanize'
       ],
       dependency_links=[
         'http://darcs.idyll.org/~t/projects/',
