@@ -9,8 +9,6 @@ from twill.namespaces import get_twill_glocals
 from parser import parse_test_call, make_dict_from_call, make_twill_local_defs
 from logging import log_info, log_warn, log_error 
 
-from cleanurl_handler import CleanURLRedirectHandler
-twill.get_browser()._browser._replace_handler("_redirect", CleanURLRedirectHandler())
 
 CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
