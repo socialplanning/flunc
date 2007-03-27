@@ -36,13 +36,14 @@ def patched_do_open(self, http_class, req):
     # here is the difference with the mechanize implementation
     # we modify the host to request to if we have a mapping for it
     # the old host will still get placed in the header though
-    host = map_host_name(host)
+    host, init_selector = map_host_name(host)
+    selector = init_selector + req.get_selector()
 
     h = http_class(host) # will parse host:port
     h.set_debuglevel(self._debuglevel)
 
     try:
-        h.request(req.get_method(), req.get_selector(), req.data, headers)
+        h.request(req.get_method(), selector, req.data, headers)
         r = h.getresponse()
     except socket.error, err: # XXX what error?
         raise URLError(err)
@@ -69,8 +70,14 @@ def patched_do_open(self, http_class, req):
 def map_host_name(old_host):
     # get the mapping from the flunc module
     from flunc import hostname_redirect_mapping
-    new_host = hostname_redirect_mapping.get(old_host, old_host)
-    return new_host
+    host = hostname_redirect_mapping.get(old_host, old_host)
+    slash_pos = host.find('/')
+    if slash_pos == -1:
+        return host, ''
+    else:
+        host, selector = host[:slash_pos], host[slash_pos:]
+        return host, selector
+        
 
 def patch_browser():
     # patch the do_open method of the http handler class
