@@ -9,7 +9,6 @@ from twill.namespaces import get_twill_glocals
 from parser import parse_test_call, make_dict_from_call, make_twill_local_defs
 from logging import log_info, log_warn, log_error 
 
-
 CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
 TEST               = '.twill' 
@@ -18,6 +17,11 @@ CONFIG_OVERRIDES   = None
 
 options = {}
 name_lookup = {}
+
+# add ability to redirect requests to different hosts
+import monkey
+monkey.patch_browser()
+hostname_redirect_mapping = {}
 
 def define_twill_vars(**kwargs): 
     tglobals, tlocals = get_twill_glocals()
@@ -164,8 +168,9 @@ def handle_exception(msg, e):
         dump_file_name = os.path.expanduser(options.dump_file)
             
         try:
-            open(dump_file_name, 'w').write(html)
-            log_info("saved error html to: %s" % dump_file_name)
+            if html is not None:
+                open(dump_file_name, 'w').write(html)
+                log_info("saved error html to: %s" % dump_file_name)
         except IOError, e:
             log_warn("Unable to save error HTML to: %s" % dump_file_name)
 
@@ -374,7 +379,10 @@ def main(argv=None):
                       dest='browser',
                       default='firefox', 
                       help="specifies web browser to use when viewing error pages [default: %default]")
-
+    parser.add_option('-m','--host-mapping',
+                      dest='host_file',
+                      default=None, 
+                      help="Specifies host mapping file to use. Syntax in file is old-host new-host")
 
 
     global options 
@@ -425,6 +433,21 @@ def main(argv=None):
 
     if options.cleanup_mode:
         log_info("Running in Cleanup-Only mode")
+
+    if options.host_file is not None:
+        try:
+            map_file = open(options.host_file)
+            lines = [x.strip() for x in map_file]
+            lines = [x for x in lines if x and not x.startswith('#')]
+            mapping = [x.split() for x in lines]
+            mapping = [x for x in mapping if len(x) == 2]
+            hostname_redirect_mapping.update(dict(mapping))
+            if options.verbose:
+                print '[*] mapping\n%s' % (
+                    '\n'.join(['%s -> %s' % (a, b) for a, b in mapping]))
+        except IOError:
+            pass
+
 
     try:
         error_tests = [] 
