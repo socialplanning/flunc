@@ -314,6 +314,10 @@ def die(message, parser=None):
         parser.print_usage()
     sys.exit(0)
 
+def set_use_tidy(value):
+    setting = int(bool(value))
+    twill.execute_string("config use_tidy %d" % value, no_reset=1)
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
@@ -383,6 +387,10 @@ def main(argv=None):
                       dest='host_file',
                       default=None, 
                       help="Specifies host mapping file to use. Syntax in file is old-host new-host")
+    parser.add_option('-y','--use-tidy',
+                      dest='use_tidy',
+                      default=False, 
+                      help="Specifies whether to use tidy or not")
 
 
     global options 
@@ -448,6 +456,7 @@ def main(argv=None):
         except IOError:
             pass
 
+    set_use_tidy(options.use_tidy)
 
     try:
         error_tests = [] 
