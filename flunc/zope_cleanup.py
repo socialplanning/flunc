@@ -12,7 +12,8 @@ def get_twill_var(varname):
     return twill_globals.get(varname)
 
 def zope_delobject(container, obj, admin_user, admin_pw): 
-    base_url = get_twill_var('base_url')
+    # use a the 'cleanup_base_url', which may be different than the base_url
+    base_url = get_twill_var('cleanup_base_url')
     prepath = get_twill_var('prepath')
 
     print "(zope) Deleting %s from %s on %s" % (obj, container, base_url)

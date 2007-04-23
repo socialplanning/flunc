@@ -336,6 +336,10 @@ def main(argv=None):
                       help='specifies the base url of the portal to test [default: %default]',
                       dest='base_url',
                       default='http://localhost:8080/openplans')
+    parser.add_option('-T', '--cleanup-host',
+                      help='specifies the base url of the portal to run the cleanup scripts against [default: base_url]',
+                      dest='cleanup_base_url',
+                      default=None)
     parser.add_option('-c', '--config',
                       help='specifies file with configuration overrides',
                       dest='config_file')
@@ -431,6 +435,11 @@ def main(argv=None):
     define_twill_vars(base_url=options.base_url)
     define_twill_vars(base_host=host)
     define_twill_vars(base_path=path)
+
+    # use the base_url if the cleanup_base_url was not specified
+    if options.cleanup_base_url is None:
+        options.cleanup_base_url = options.base_url
+    define_twill_vars(cleanup_base_url=options.base_url)
     
     if options.config_file: 
         try: 
