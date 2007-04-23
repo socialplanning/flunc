@@ -439,7 +439,7 @@ def main(argv=None):
     # use the base_url if the cleanup_base_url was not specified
     if options.cleanup_base_url is None:
         options.cleanup_base_url = options.base_url
-    define_twill_vars(cleanup_base_url=options.base_url)
+    define_twill_vars(cleanup_base_url=options.cleanup_base_url)
     
     if options.config_file: 
         try: 
