@@ -22,6 +22,6 @@ def zope_delobject(container, obj, admin_user, admin_pw):
     host, path = urllib.splithost(uri)
     if prepath is not None:
         path = prepath + path
-    auth_url = "%s://%s:%s@%s%s" % (scheme, admin_user, admin_pw, host, path)
+    auth_url = "%s://%s:%s@%s%s/" % (scheme, admin_user, admin_pw, host, path)
     portal = XMLRPCServer(auth_url)
     getattr(portal, container).manage_delObjects([obj])
