@@ -17,6 +17,7 @@ def patched_do_open(self, http_class, req):
     - geturl(): return the original request URL
     - code: HTTP status code
     """
+
     host = req.get_host()
     if not host:
         raise URLError('no host given')
@@ -36,7 +37,13 @@ def patched_do_open(self, http_class, req):
     # here is the difference with the mechanize implementation
     # we modify the host to request to if we have a mapping for it
     # the old host will still get placed in the header though
+
+    old_host = host 
     host, init_selector = map_host_name(host)
+    if old_host != host: 
+        print "[!] host_alias mapped %s -> %s" % (old_host, host)
+
+
     selector = init_selector + req.get_selector()
 
     h = http_class(host) # will parse host:port
