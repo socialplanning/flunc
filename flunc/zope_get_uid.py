@@ -26,6 +26,6 @@ def get_uid(username, admin_user, admin_pw):
     auth_url = "%s://%s:%s@%s%s/" % (scheme, admin_user, admin_pw, host, path)
     portal = XMLRPCServer(auth_url)
 
-    confirmation_code = getattr(portal.portal_memberdata, username).UID()
+    confirmation_code = getattr(portal.portal_memberdata, username).getUserConfirmationCode()
 
     locals['__uid__'] = confirmation_code
