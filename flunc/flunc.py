@@ -13,7 +13,8 @@ CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
 TEST               = '.twill' 
 CLEANUP            = '_cleanup'
-CONFIG_OVERRIDES   = None
+CONFIG_OVERRIDE_SCRIPT   = None
+CONFIG_OVERRIDE_DICT = {}
 
 options = {}
 name_lookup = {}
@@ -231,11 +232,13 @@ def do_cleanup_for(name):
 
 
 def load_overrides(): 
-    if CONFIG_OVERRIDES: 
+    if CONFIG_OVERRIDE_SCRIPT: 
         try:
-            twill.execute_string(CONFIG_OVERRIDES, no_reset=1)
+            twill.execute_string(CONFIG_OVERRIDE_SCRIPT, no_reset=1)
         except Exception, e:
-            handle_exception('Error in global configuration', e)
+            handle_exception('Error in global configuration overrides', e)
+    if CONFIG_OVERRIDE_DICT:
+        define_twill_vars(**CONFIG_OVERRIDE_DICT)
 
 def load_configuration(name): 
     if file_exists(name,CONFIGURATION):
@@ -343,6 +346,9 @@ def main(argv=None):
     parser.add_option('-c', '--config',
                       help='specifies file with configuration overrides',
                       dest='config_file')
+    parser.add_option('-D', '--define',
+                      help="specifies configuration overrides as a comma separated list of name='value' pairs",
+                      dest='global_defines')                      
     parser.add_option('-l', '--list',
                       dest='list_suites',
                       action='store_true',
@@ -443,10 +449,16 @@ def main(argv=None):
     
     if options.config_file: 
         try: 
-            global CONFIG_OVERRIDES 
-            CONFIG_OVERRIDES = read_configuration(options.config_file)
+            global CONFIG_OVERRIDE_SCRIPT 
+            CONFIG_OVERRIDE_SCRIPT = read_configuration(options.config_file)
         except IOError, msg: 
             die(msg)
+
+    if options.global_defines:
+        try:
+            CONFIG_OVERRIDE_DICT.update(eval('dict(%s)' % options.global_defines))
+        except Exception, msg:
+            die('Error parsing global definitions (%s): %s' % (options.global_defines, msg))
 
     if options.cleanup_mode:
         log_info("Running in Cleanup-Only mode")

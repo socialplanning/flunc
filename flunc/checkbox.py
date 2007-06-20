@@ -2,8 +2,18 @@ import twill
 from twill import commands
 import ClientForm
 
-__all__ = ['edit_checkbox']
+__all__ = ['edit_checkbox', 'check_radio_values']
 
+def check_radio_values(formname, name, values_str):
+    """
+    checks the values in the comma seperated list 'values'
+    eg:
+    check_radio_values('some_form', 'favorites', 'apples, bannanas, onions')
+    """
+    values = [x.strip() for x in values_str.split(',') if x.strip()]
+    for value in values:
+        edit_checkbox(formname, name, value)
+        
 def edit_checkbox(formname, name, value):
 
     if has_multiple_values(formname, name):
