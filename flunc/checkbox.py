@@ -3,9 +3,9 @@ from twill import commands
 from twill.errors import TwillAssertionError
 import ClientForm
 
-__all__ = ['edit_checkbox', 'check_radio_values']
+__all__ = ['edit_checkbox', 'check_group_values']
 
-def check_radio_values(formname, name, values_str):
+def check_group_values(formname, name, values_str):
     """
     checks the values in the comma seperated list 'values'
     eg:
