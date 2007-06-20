@@ -1,5 +1,6 @@
 import twill
 from twill import commands
+from twill.errors import TwillAssertionError
 import ClientForm
 
 __all__ = ['edit_checkbox', 'check_radio_values']
