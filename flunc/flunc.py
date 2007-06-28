@@ -182,7 +182,7 @@ def handle_exception(msg, e):
 
     if options.show_error_in_browser:
         if options.dump_file == '-': 
-            log_warning("Web browser view is not supported when dumping error html to standard out.")
+            log_warn("Web browser view is not supported when dumping error html to standard out.")
         else:
             try:
                 log_info("Launching web browser...")
@@ -428,7 +428,7 @@ def main(argv=None):
 
     scheme, uri = urllib.splittype(options.base_url)
     if scheme is None: 
-        warn("no scheme specified in test url, assuming http")
+        log_warn("no scheme specified in test url, assuming http")
         options.base_url = "http://" + options.base_url 
     elif not scheme == 'http' and not scheme == 'https':
         die("unsupported scheme '%s' in '%s'" % (scheme,options.base_url))
