@@ -21,10 +21,7 @@ setup(name="flunc",
         'twill',
       ],
       dependency_links=[
-        # Latest twill is broken, defaulting to cheeseshop
-        # (http://lists.idyll.org/pipermail/twill/2007-July/000715.html)
-
-        # 'http://darcs.idyll.org/~t/projects/',
+        'http://darcs.idyll.org/~t/projects/',
       ],
       include_package_data=True,
       entry_points="""

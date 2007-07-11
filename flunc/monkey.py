@@ -2,7 +2,7 @@ import socket
 from urllib2 import URLError
 
 import twill
-from twill.other_packages.mechanize._response import closeable_response
+from twill.other_packages._mechanize_dist._response import closeable_response
 
 def patched_do_open(self, http_class, req):
     """XXX This is copied from the mechanize AbstractHTTPHandler
