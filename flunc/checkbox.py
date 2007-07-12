@@ -1,7 +1,7 @@
 import twill
 from twill import commands
 from twill.errors import TwillAssertionError
-import ClientForm
+from twill.other_packages._mechanize_dist import ClientForm
 
 __all__ = ['edit_checkbox', 'check_group_values']
 
