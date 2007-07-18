@@ -441,6 +441,7 @@ def main(argv=None):
     define_twill_vars(base_url=options.base_url)
     define_twill_vars(base_host=host)
     define_twill_vars(base_path=path)
+    define_twill_vars(test_path=os.path.realpath(options.search_path))
 
     # use the base_url if the cleanup_base_url was not specified
     if options.cleanup_base_url is None:
