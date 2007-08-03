@@ -22,10 +22,13 @@ def create_doc(container, admin_user, admin_pw, id, title, body, revision=None):
         path = prepath + path
     auth_url = "%s://%s:%s@%s%s/" % (scheme, admin_user, admin_pw, host, path)
     portal = XMLRPCServer(auth_url)
-    getattr(portal, container).invokeFactory('Document', id, title)
+    getattr(portal, container).invokeFactory('Document', id)
     item = getattr(getattr(portal, container), id)
-    item.setText('body')
+    item.setTitle(title)
+    item.setText(body)
+    item.reindexObject()
 
     # set the revision text
+    # getting an unauthorized error
 #    if revision:
 #        getattr(portal, 'portal_repository').save(revision)
