@@ -26,9 +26,10 @@ def create_doc(container, admin_user, admin_pw, id, title, body, revision=None):
     item = getattr(getattr(portal, container), id)
     item.setTitle(title)
     item.setText(body)
-    item.reindexObject()
 
-    # set the revision text
-    # getting an unauthorized error
+    # XXX getting error:
+    # TypeError: cannot marshal <type 'instancemethod'> objects
 #    if revision:
-#        getattr(portal, 'portal_repository').save(revision)
+#        getattr(portal, 'portal_repository').save(item, revision)
+
+    item.reindexObject()
