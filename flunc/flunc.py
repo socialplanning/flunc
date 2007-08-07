@@ -7,7 +7,7 @@ import twill
 from twill.namespaces import get_twill_glocals
 
 from parser import parse_test_call, make_dict_from_call, make_twill_local_defs
-from logging import log_info, log_warn, log_error 
+from logging import log_info, log_warn, log_error, output_stream
 
 CONFIGURATION      = '.conf'
 SUITE              = '.tsuite'
@@ -83,8 +83,8 @@ def list_suites():
         if ext != SUITE or base.endswith(CLEANUP):
             continue
         found_suite = True 
-        print '%s' % base
-        print '  from %s' % rel_filename(full)
+        log_info('%s' % base)
+        log_info('  from %s' % rel_filename(full))
         f = open(full)
         lines = f.readlines()
         f.close()
@@ -96,9 +96,9 @@ def list_suites():
                 # End of comment header
                 break
             line = line.lstrip('# ')
-            print '    %s' % line
+            log_info('    %s' % line)
     if not found_suite:
-        print "No suites found"
+        log_info("No suites found")
 
 def rel_filename(filename, relative_to=None):
     """
@@ -258,9 +258,10 @@ def load_configuration(name):
 
 def run_suite(name):
     try: 
+        if not options.cleanup_mode:
+            log_info("running suite: %s" % name)
+            output_stream.indent()
         try:
-            if not options.cleanup_mode:
-                log_info("running suite: %s" % name)
         
             suite_data = read_suite(name)
             calls = parse_suite(suite_data)
@@ -281,6 +282,7 @@ def run_suite(name):
             return [name]
     finally: 
         do_cleanup_for(name)
+        output_stream.outdent()
 
 def run_test(name,args): 
     if file_exists(name, SUITE):
@@ -294,25 +296,29 @@ def run_test(name,args):
         if options.cleanup_mode:
             return []
 
-        try:            
+        try:
             log_info("running test: %s" % name)
-            script = read_test(name)
-            script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
-            twill.execute_string(script, no_reset=1)
-            return []
-        except IOError, e: 
-            handle_exception("Unable to read test '%s'" % (name + TEST), e)
-            return [name]
-        except Exception, e: 
-            handle_exception("Error running %s" % name, e)
-            return [name]
+            output_stream.indent()
+            try:            
+                script = read_test(name)
+                script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
+                twill.execute_string(script, no_reset=1)
+                return []
+            except IOError, e: 
+                handle_exception("Unable to read test '%s'" % (name + TEST), e)
+                return [name]
+            except Exception, e: 
+                handle_exception("Error running %s" % name, e)
+                return [name]
+        finally:
+            output_stream.outdent()
     else:
         raise NameError("Unable to locate %s or %s in search path" %
                         (name + TEST, name + SUITE))
 
 
 def die(message, parser=None): 
-    print message 
+    log_error(message)
     if parser is not None:
         parser.print_usage()
     sys.exit(0)
@@ -473,8 +479,8 @@ def main(argv=None):
             mapping = [x for x in mapping if len(x) == 2]
             hostname_redirect_mapping.update(dict(mapping))
             if options.verbose:
-                print '[*] mapping\n%s' % (
-                    '\n'.join(['%s -> %s' % (a, b) for a, b in mapping]))
+                log_info('[*] mapping\n%s' % (
+                    '\n'.join(['%s -> %s' % (a, b) for a, b in mapping])))
         except IOError:
             pass
 

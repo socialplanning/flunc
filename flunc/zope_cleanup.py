@@ -2,7 +2,7 @@ import twill
 from twill.namespaces import get_twill_glocals 
 from xmlrpclib import Server as XMLRPCServer 
 import urllib 
-from logging import log_error 
+from logging import log_error, log_warn
 from flunc import options
 
 
@@ -18,7 +18,7 @@ def zope_delobject(container, obj, admin_user, admin_pw):
     base_url = get_twill_var('cleanup_base_url')
     prepath = get_twill_var('prepath')
 
-    print "(zope) Deleting %s from %s on %s" % (obj, container, base_url)
+    log_warn("(zope) Deleting %s from %s on %s" % (obj, container, base_url))
 
     scheme, uri = urllib.splittype(base_url) 
     host, path = urllib.splithost(uri)
