@@ -4,6 +4,8 @@ from xmlrpclib import Server as XMLRPCServer
 import urllib 
 from twill.commands import go
 
+from logging import log_warn
+
 __all__ = ['get_uid']
 
 
@@ -17,7 +19,7 @@ def get_uid(username, admin_user, admin_pw):
     base_url = globals.get('base_url')
     prepath = globals.get('prepath')
 
-    print "(zope) Getting uid for user %s on %s" % (username, base_url)
+    log_warn("(zope) Getting uid for user %s on %s" % (username, base_url))
 
     scheme, uri = urllib.splittype(base_url) 
     host, path = urllib.splithost(uri)
