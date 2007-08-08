@@ -2,7 +2,7 @@ import twill
 from twill.namespaces import get_twill_glocals 
 from xmlrpclib import Server as XMLRPCServer 
 import urllib 
-
+from logging import log_warn
 
 __all__ = ['create_doc']
 
@@ -15,7 +15,7 @@ def create_doc(container, admin_user, admin_pw, id, title, body, revision=None):
     base_url = get_twill_var('base_url')
     prepath = get_twill_var('prepath')
 
-    print "(zope) Creating document %s in %s" % (id, container)
+    log_warn("(zope) Creating document %s in %s" % (id, container))
     scheme, uri = urllib.splittype(base_url) 
     host, path = urllib.splithost(uri)
     if prepath is not None:
