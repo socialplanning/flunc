@@ -83,8 +83,8 @@ def list_suites():
         if ext != SUITE or base.endswith(CLEANUP):
             continue
         found_suite = True 
-        log_info('%s' % base)
-        log_info('  from %s' % rel_filename(full))
+        print '%s' % base
+        print '  from %s' % rel_filename(full)
         f = open(full)
         lines = f.readlines()
         f.close()
@@ -96,9 +96,9 @@ def list_suites():
                 # End of comment header
                 break
             line = line.lstrip('# ')
-            log_info('    %s' % line)
+            print '    %s' % line
     if not found_suite:
-        log_info("No suites found")
+        print "No suites found"
 
 def rel_filename(filename, relative_to=None):
     """
