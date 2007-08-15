@@ -3,13 +3,16 @@ import re
 
 variable_expression = re.compile("\${(.*?)}")
 
-def _substitute_vars(raw_str, globals_dict):
+def substitute_vars(raw_str, globals_dict, wrapper=None): 
     result = ''
     pos = 0
     for m in variable_expression.finditer(raw_str):
         result = result+raw_str[pos:m.start()]
         try:
-            result += "'%s'" % eval(m.group(1), globals_dict, {})
+            val = eval(m.group(1), globals_dict, {})
+            if wrapper is not None:
+                val = wrapper(val)
+            result += val
         except NameError:
             raise NameError("Unbound variable '%s' in: '%s'" % \
                             (m.group(1), raw_str))
@@ -17,12 +20,16 @@ def _substitute_vars(raw_str, globals_dict):
     result += raw_str[pos:]
     return result
 
+def single_quote_wrapper(x):
+    return "'%s'" % x 
+
 def make_dict_from_call(raw_str, globals_dict): 
     if raw_str: 
-        str = 'dict' + _substitute_vars(raw_str, globals_dict)
+        str = 'dict' + substitute_vars(raw_str, globals_dict, wrapper=single_quote_wrapper)
         return eval(str)
     else: 
         return {}
+
 
 def make_twill_local_defs(vars): 
     return '\n'.join("setlocal %s '%s'" % (k,v) for k,v in vars.items()) + '\n'
