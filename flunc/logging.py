@@ -10,12 +10,29 @@ class IndentedStream(object):
         self.pred = output_pred
         self.indentation = 0
         self.nspaces = 4
+
+        # XXX to work around twill at ==> strings
+        self.saw_at = False
     def write(self, s):
         if not self.pred(s): return
+
         spacing = ' ' * self.nspaces * self.indentation
-        # one newline
-        msg = s.strip() + '\n'
+        msg = s.strip()
+
+        # XXX hard code the case for the twill at ==> at strings
+        # this can probably be worked around more gracefully
+        # but we can wait until we have the need
+        if self.saw_at:
+            self.saw_at = False
+            spacing = ' '
+            msg += '\n'
+        elif msg == '==> at':
+            self.saw_at = True
+        else:
+            msg += '\n'
+
         self.fstream.write(spacing + msg)
+
     def indent(self):
         self.indentation += 1
     def outdent(self):
