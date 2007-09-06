@@ -2,6 +2,7 @@ import optparse
 import sys
 import os 
 import urllib
+import re
 
 import twill 
 from twill.namespaces import get_twill_glocals
@@ -170,7 +171,19 @@ def handle_exception(msg, e):
             
         try:
             if html is not None:
-                open(dump_file_name, 'w').write(html)
+                if options.show_error_in_browser:
+                    # If we are showing it in the browser, lets get the
+                    # paths right (even if if means changing the HTML a
+                    # little)
+                    base_href = '\n<!-- added by flunc: --><base href="%s">' % twill.get_browser().get_url()
+                    match = re.search('<head.*?>', html, re.I|re.S)
+                    if match:
+                        html = html[:match.end()] + base_href + html[match.end():]
+                    else:
+                        html = base_href + html
+                f = open(dump_file_name, 'wb')
+                f.write(html)
+                f.close()
                 log_info("saved error html to: %s" % dump_file_name)
         except IOError, e:
             log_warn("Unable to save error HTML to: %s" % dump_file_name)
