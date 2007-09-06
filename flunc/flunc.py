@@ -418,7 +418,8 @@ def main(argv=None):
                       help="Specifies host mapping file to use. Syntax in file is old-host new-host")
     parser.add_option('-y','--use-tidy',
                       dest='use_tidy',
-                      default=False, 
+                      default=False,
+                      action="store_true",
                       help="Specifies whether to use tidy or not")
 
 
