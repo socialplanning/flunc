@@ -2,7 +2,7 @@
 from setuptools import Command
 import pkg_resources
 from pkg_resources import resource_filename, Requirement
-from flunc.flunc import get_optparser, main as run_flunc
+from flunc import get_optparser, main as run_flunc
 import sys
 
 def convert_to_useroptions(optparser):
