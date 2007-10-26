@@ -43,9 +43,9 @@ def is_disabled(formname, name, value=None):
     if not form:
         raise TwillAssertionError("no matching forms!")
     control = browser.get_form_field(form, name)
-    if option:
-        if not (control.disabled or control.get_item_disabled(option)):
-            raise TwillAssertionError("%r option %r not disabled!" % (name, option))
+    if value:
+        if not (control.disabled or control.get_item_disabled(value)):
+            raise TwillAssertionError("%r value %r not disabled!" % (name, value))
         return
     if not control.disabled:
         raise TwillAssertionError("input %r not disabled!" % name)
