@@ -3,7 +3,7 @@ from twill import commands
 from twill.errors import TwillAssertionError
 from twill.other_packages._mechanize_dist import ClientForm
 
-__all__ = ['edit_checkbox', 'check_group_values']
+__all__ = ['edit_checkbox', 'check_group_values', 'has_multiple_values', 'is_disabled']
 
 def check_group_values(formname, name, values_str):
     """
@@ -32,3 +32,20 @@ def has_multiple_values(formname, name):
         raise TwillAssertionError("no matching forms!")
     control = browser.get_form_field(form, name)
     return hasattr(control, 'items') and len(control.items) > 1
+
+def is_disabled(formname, name, value=None):
+    """Raise an exception if the named control is not disabled.  If
+    the value argument is passed, the test applies only to options
+    with that value.
+    """
+    browser = twill.get_browser()
+    form = browser.get_form(formname)
+    if not form:
+        raise TwillAssertionError("no matching forms!")
+    control = browser.get_form_field(form, name)
+    if option:
+        if not (control.disabled or control.get_item_disabled(option)):
+            raise TwillAssertionError("%r option %r not disabled!" % (name, option))
+        return
+    if not control.disabled:
+        raise TwillAssertionError("input %r not disabled!" % name)
