@@ -1,7 +1,10 @@
 import twill
 from twill import commands
 from twill.errors import TwillAssertionError
-from twill.other_packages._mechanize_dist import ClientForm
+try:
+    from twill.other_packages import ClientForm
+except ImportError:
+    from twill.other_packages._mechanize_dist import ClientForm
 
 __all__ = ['edit_checkbox', 'check_group_values', 'has_multiple_values', 'is_disabled']
 
