@@ -421,6 +421,10 @@ def main(argv=None):
                       default=False,
                       action="store_true",
                       help="Specifies whether to use tidy or not")
+    parser.add_option('-L', '--language',
+                      dest='language',
+                      default='az, en', 
+                      help='Specifies what language to request in the http headers [default: %default]')
 
 
     global options 
@@ -499,6 +503,8 @@ def main(argv=None):
             pass
 
     set_use_tidy(options.use_tidy)
+
+    twill.execute_string("add_extra_header 'Accept-Language' '%s'" % options.language)   
 
     try:
         error_tests = [] 
