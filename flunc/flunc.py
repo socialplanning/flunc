@@ -3,6 +3,7 @@ import sys
 import os 
 import urllib
 import re
+import time
 
 import twill 
 from twill.namespaces import get_twill_glocals
@@ -162,7 +163,8 @@ def do_twill_repl():
 
 def handle_exception(msg, e):
     maybe_print_stack()
-
+    log_error("Caught exception at %s" %
+              time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
     html = twill.get_browser().get_html()
     if options.dump_file == '-':
         print html
