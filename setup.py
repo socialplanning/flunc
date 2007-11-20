@@ -1,10 +1,10 @@
-__version__ = '0.1'
+__version__ = '0.1.2'
 
 from setuptools import setup, find_packages
 
 setup(name="flunc",
       version=__version__,
-      description="",
+      description="Functional test suite runner",
       long_description="""\
 """,
       classifiers=[
@@ -27,6 +27,10 @@ setup(name="flunc",
       entry_points="""
       [console_scripts]
       flunc = flunc.flunc:main
+      [distutils.setup_keywords]
+      ftest_require=setuptools.dist:check_requirements
+      [distutils.commands]
+      ftest = flunc.command:ftest
       """,
       )
 
