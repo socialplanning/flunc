@@ -30,7 +30,7 @@ setup(name="flunc",
       [distutils.setup_keywords]
       ftest_require=setuptools.dist:check_requirements
       [distutils.commands]
-      ftest = flunc.command:ftest
+      flunc = flunc.command:ftest_runner
       """,
       )
 
