@@ -19,12 +19,12 @@ def convert_to_useroptions(optparser):
     return user_opts
 
 
-class ftest(Command):
+class ftest_runner(Command):
     """subclassable command to run flunc tests for a package where
     ftests"""
     description = "run flunc tests"
 
-    resource_name = 'ftest'
+    resource_name = 'ftests'
     flunc_opts, description = get_optparser()
     user_options = convert_to_useroptions(flunc_opts)
     user_options.append(('suite', 't', 'name of test suite to run'))
