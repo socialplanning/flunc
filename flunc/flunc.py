@@ -299,7 +299,7 @@ def run_suite(name):
         do_cleanup_for(name)
         output_stream.outdent()
 
-def run_test(name,args): 
+def run_test(name,args):
     if file_exists(name, SUITE):
         if args:
             log_warn("Arguments provided to suites are ignored! [%s%s]" 
@@ -346,93 +346,12 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    base_dir = os.path.dirname(os.path.dirname(__file__))
-    ftest_dir = rel_filename(os.path.join(base_dir, 'ftests'))
-    if not ftest_dir.startswith(os.path.sep):
-        # Suppress optparse's word wrapping:
-        ftest_dir = '.'+os.path.sep+ftest_dir
-
-
-
-    usage = "usage: %prog [options] <test name> [test name...]"
-    parser = optparse.OptionParser(usage=usage)
-    parser.add_option('-t', '--host',
-                      help='specifies the base url of the portal to test [default: %default]',
-                      dest='base_url',
-                      default='http://localhost:8080/openplans')
-    parser.add_option('-T', '--cleanup-host',
-                      help='specifies the base url of the portal to run the cleanup scripts against [default: base_url]',
-                      dest='cleanup_base_url',
-                      default=None)
-    parser.add_option('-c', '--config',
-                      help='specifies file with configuration overrides',
-                      dest='config_file')
-    parser.add_option('-D', '--define',
-                      help="specifies configuration overrides as a comma separated list of name='value' pairs",
-                      dest='global_defines')                      
-    parser.add_option('-l', '--list',
-                      dest='list_suites',
-                      action='store_true',
-                      help="List the available suites (don't test anything)")
-    parser.add_option('-p', '--path',
-                      dest='search_path',
-                      default=ftest_dir, 
-                      help='specifies location to search for tests [default: %default]')
-    parser.add_option('-r', '--recursive',
-                      dest='recursive',
-                      action='store_true',
-                      help="search recursively for tests in the search path")
-    parser.add_option('-v', '--verbose',
-                      dest='verbose',
-                      action='store_true',
-                      help="Display stack traces from twill")
-    parser.add_option('-i', '--interactive-debug',
-                      dest='interactive',
-                      action='store_true',
-                      help="Fall into twill shell on error")
-    parser.add_option('-C', '--cleanup-only',
-                      dest='cleanup_mode',
-                      action='store_true',
-                      help="Only run cleanup handlers for suites given.")
-    parser.add_option('-X', '--no-cleanup',
-                      dest='no_cleanup_mode',
-                      action='store_true',
-                      help="Do not run cleanup handlers.")
-    parser.add_option('-F', '--ignore-failures',
-                      dest='ignore_failures',
-                      action='store_true',
-                      help="continue running tests after failures")
-    parser.add_option('-d', '--dump-html',
-                      dest='dump_file',
-                      default='err.html',
-                      help="set file to dump HTML to when an error is encountered.  specify - for stdout. [default: %default]")
-    parser.add_option('-w', '--show-error-in-browser', 
-                      dest='show_error_in_browser', 
-                      action='store_true',
-                      help="show dumped HTML in a web browser on error, forces interactive mode")
-    parser.add_option('-b','--browser',
-                      dest='browser',
-                      default='firefox', 
-                      help="specifies web browser to use when viewing error pages [default: %default]")
-    parser.add_option('-m','--host-mapping',
-                      dest='host_file',
-                      default=None, 
-                      help="Specifies host mapping file to use. Syntax in file is old-host new-host")
-    parser.add_option('-y','--use-tidy',
-                      dest='use_tidy',
-                      default=False,
-                      action="store_true",
-                      help="Specifies whether to use tidy or not")
-    parser.add_option('-L', '--language',
-                      dest='language',
-                      default='az, en', 
-                      help='Specifies what language to request in the http headers [default: %default]')
-
+    parser, usage = get_optparser()
 
     global options 
     options, args = parser.parse_args(argv)
 
-    global name_lookup 
+    global name_lookup
     name_lookup = scan_for_tests(os.path.expanduser(options.search_path), options.recursive)
 
     if options.list_suites:
@@ -528,6 +447,86 @@ def main(argv=None):
             log_info('%d Errors Found' % nerrors)
             log_info('Failing Tests:\n%s' % '\n'.join(error_tests))
 
+def get_optparser():
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    ftest_dir = rel_filename(os.path.join(base_dir, 'ftests'))
+    if not ftest_dir.startswith(os.path.sep):
+        # Suppress optparse's word wrapping:
+        ftest_dir = '.'+os.path.sep+ftest_dir
+    usage = "usage: %prog [options] <test name> [test name...]"
+    parser = optparse.OptionParser(usage=usage)
+    parser.add_option('-t', '--host',
+                      help='specifies the base url of the portal to test [default: %default]',
+                      dest='base_url',
+                      default='http://localhost:8080/openplans')
+    parser.add_option('-T', '--cleanup-host',
+                      help='specifies the base url of the portal to run the cleanup scripts against [default: base_url]',
+                      dest='cleanup_base_url',
+                      default=None)
+    parser.add_option('-c', '--config',
+                      help='specifies file with configuration overrides',
+                      dest='config_file')
+    parser.add_option('-D', '--define',
+                      help="specifies configuration overrides as a comma separated list of name='value' pairs",
+                      dest='global_defines')                      
+    parser.add_option('-l', '--list',
+                      dest='list_suites',
+                      action='store_true',
+                      help="List the available suites (don't test anything)")
+    parser.add_option('-p', '--path',
+                      dest='search_path',
+                      default=ftest_dir, 
+                      help='specifies location to search for tests [default: %default]')
+    parser.add_option('-r', '--recursive',
+                      dest='recursive',
+                      action='store_true',
+                      help="search recursively for tests in the search path")
+    parser.add_option('-v', '--verbose',
+                      dest='verbose',
+                      action='store_true',
+                      help="Display stack traces from twill")
+    parser.add_option('-i', '--interactive-debug',
+                      dest='interactive',
+                      action='store_true',
+                      help="Fall into twill shell on error")
+    parser.add_option('-C', '--cleanup-only',
+                      dest='cleanup_mode',
+                      action='store_true',
+                      help="Only run cleanup handlers for suites given.")
+    parser.add_option('-X', '--no-cleanup',
+                      dest='no_cleanup_mode',
+                      action='store_true',
+                      help="Do not run cleanup handlers.")
+    parser.add_option('-F', '--ignore-failures',
+                      dest='ignore_failures',
+                      action='store_true',
+                      help="continue running tests after failures")
+    parser.add_option('-d', '--dump-html',
+                      dest='dump_file',
+                      default='err.html',
+                      help="set file to dump HTML to when an error is encountered.  specify - for stdout. [default: %default]")
+    parser.add_option('-w', '--show-error-in-browser', 
+                      dest='show_error_in_browser', 
+                      action='store_true',
+                      help="show dumped HTML in a web browser on error, forces interactive mode")
+    parser.add_option('-b','--browser',
+                      dest='browser',
+                      default='firefox', 
+                      help="specifies web browser to use when viewing error pages [default: %default]")
+    parser.add_option('-m','--host-mapping',
+                      dest='host_file',
+                      default=None, 
+                      help="Specifies host mapping file to use. Syntax in file is old-host new-host")
+    parser.add_option('-y','--use-tidy',
+                      dest='use_tidy',
+                      default=False,
+                      action="store_true",
+                      help="Specifies whether to use tidy or not")
+    parser.add_option('-L', '--language',
+                      dest='language',
+                      default='az, en', 
+                      help='Specifies what language to request in the http headers [default: %default]')
+    return parser, usage
 
 if __name__ == '__main__':
     main(sys.argv)
