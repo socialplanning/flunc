@@ -332,7 +332,8 @@ def run_test(name,args):
                         (name + TEST, name + SUITE))
 
 
-def die(message, parser=None): 
+def die(message, parser=None):
+    message = str(message)
     log_error(message)
     if parser is not None:
         parser.print_usage()
@@ -397,7 +398,7 @@ def main(argv=None):
         try: 
             global CONFIG_OVERRIDE_SCRIPT 
             CONFIG_OVERRIDE_SCRIPT = read_configuration(options.config_file)
-        except IOError, msg: 
+        except IOError, msg:
             die(msg)
 
     if options.global_defines:
