@@ -30,12 +30,15 @@ def define_twill_vars(**kwargs):
     tglobals, tlocals = get_twill_glocals()
     tglobals.update(kwargs)
 
-def read_file_type(name, ext): 
-    try: 
+def read_file_type(name, ext):
+    try:
         filename = name_lookup[name + ext]
-        return open(filename).read()
     except KeyError:
-        raise IOError('Unable to locate %s in the search path' % (name + ext))
+        if name.startswith('/'):
+            filename = name
+        else:
+            raise IOError('Unable to locate %s in the search path' % (name + ext))
+    return open(filename).read()
 
 def file_exists(name,ext):
     return name_lookup.has_key(name + ext)
