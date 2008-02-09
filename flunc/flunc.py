@@ -121,7 +121,18 @@ def rel_filename(filename, relative_to=None):
         return filename
 
 def read_configuration(name): 
-    return read_file_type(name, CONFIGURATION)
+    conftext = read_file_type(name, CONFIGURATION)
+    lines = conftext.split('\n')
+    output = []
+    for line in lines:
+        tokens = line.strip().split()
+        if tokens and tokens[0] == 'include':
+            for includename in tokens[1:]:
+                log_info('including config %s' % includename)
+                output.append(read_configuration(includename))
+        else:
+            output.append(line)
+    return '\n'.join(output)
 
 def read_suite(name): 
     return read_file_type(name, SUITE)
