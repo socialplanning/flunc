@@ -57,7 +57,24 @@ class Namespace(object):
         self.namespaces = dict([(i.name(), i) 
                                 for i in self.namespaces])
 
-    def lookup(self, path):
+    def get(self, path, _type):
+        if path.startswith(PATH_SEP):
+            namespace = name_lookup
+            path = path[1:]
+        else:
+            namespace = self # XXX bad?
+        path = path.split(PATH_SEP)
+        if len(path) == 1:
+            path = path[0]
+            item = getattr(namespace, _type).get(path)
+            if item:
+                return item
+        else:
+            ns = namespace.namespaces.get(path[0])
+            if ns:
+                return ns.lookup(PATH_SEP.join(path[1:]))
+
+    def lookup(self, path, set_current=True, types=('suites', 'tests')):
         """
         return a test and set the current namespace for that test
         returns None if the test is not found
@@ -67,21 +84,20 @@ class Namespace(object):
         path = path.split(PATH_SEP)
         if len(path) == 1:
             path = path[0]
-            suite = self.suites.get(path)
-            if suite:
-                current_namespace.append(self)
-                return path
-            test = self.tests.get(path)
-            if test:
-                current_namespace.append(self)
-                return path
-            else:
-                ns = self.namespaces.get(path)
-                if ns:
-                    suite = ns.suites.get(path)
-                    if suite:
-                        current_namespace.append(ns)
-                        return path
+            for _type in types:
+                item = getattr(self, _type).get(path)
+                if item:
+                    if set_current:
+                        current_namespace.append(self)
+                    return path
+                elif _type == 'suites': # XXX hack
+                    ns = self.namespaces.get(path)
+                    if ns:
+                        suite = ns.suites.get(path)
+                        if suite:
+                            if set_current:  # XXX this should be true here
+                                current_namespace.append(ns)
+                            return path
         else:
             ns = self.namespaces.get(path[0])
             if ns:
@@ -181,14 +197,18 @@ def read_configuration(name):
         tokens = line.strip().split()
         if tokens and tokens[0] == 'include':
             for includename in tokens[1:]:
-                log_info('including config %s' % includename)
-                output.append(read_configuration(includename))
+                _includename = current_namespace[-1].get(includename, _type='conf')
+                if _includename is None:
+                    log_error('including configuration file %s from %s not found' % ( includename, name ))
+                else:
+                    log_info('including config %s' % includename)
+                    output.append(read_configuration(_includename))
         else:
             output.append(line)
     return '\n'.join(output)
 
 def read_test(name):
-    return file(current_namespace[-1].tests[name]).read()
+    return file(current_namespace[-1].get(name, _type='tests')).read()
 
 def has_cleanup_handler(name):
     return current_namespace[-1].cleanup.has_key(name)
