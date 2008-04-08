@@ -17,9 +17,97 @@ TEST               = '.twill'
 CLEANUP            = '_cleanup'
 CONFIG_OVERRIDE_SCRIPT   = None
 CONFIG_OVERRIDE_DICT = {}
+PATH_SEP  = '.'
 
 options = {}
 name_lookup = {}
+
+class Namespace(object):
+
+
+    def __init__(self, directory, base_dir=None):
+
+        # tests, suites, and associated data
+        self.tests = {}
+        self.suites = {}
+        self.conf = {}
+        self.cleanup = {}
+
+        self.directory = directory
+
+        # XXX is base_dir needed?  its not used
+        if base_dir is None: 
+            base_dir = directory
+
+        if not os.path.isdir(directory):
+            log_warn("Test directory not found (%s). Use -p to specify test search path" % directory)
+            # raise SomeThing
+            return
+
+        self.base_dir = base_dir
+        self.scan_for_tests()
+        files = [ os.path.join(self.directory, i)
+                  for i in os.listdir(self.directory) ]
+        self.namespaces = [ Namespace(i, base_dir) 
+                            for i in files
+                            if os.path.isdir(i) ]
+        self.namespaces = [ i for i in self.namespaces
+                            if i.tests ]
+        self.namespaces = dict([(i.name(), i) 
+                                for i in self.namespaces])
+
+    def lookup(self, path):
+        """
+        return a test and set the current namespace for that test
+        returns None if the test is not found
+        """
+
+        global current_namespace
+        path = path.split(PATH_SEP)
+        if len(path) == 1:
+            path = path[0]
+            suite = self.suites.get(path)
+            if suite:
+                current_namespace.append(self)
+                return path
+            test = self.tests.get(path)
+            if test:
+                current_namespace.append(self)
+                return path
+            else:
+                ns = self.namespaces.get(path)
+                if ns:
+                    suite = ns.suites.get(path)
+                    if suite:
+                        current_namespace.append(ns)
+                        return path
+        else:
+            ns = self.namespaces.get(path[0])
+            if ns:
+                return ns.lookup(PATH_SEP.join(path[1:]))
+
+    def scan_for_tests(self): 
+        """
+        scans for relevant files in the directory given.
+        """
+        log_info("scanning for tests in '%s'" % self.directory)
+        for filename in os.listdir(self.directory):
+            base, ext = os.path.splitext(filename)
+            fullname = os.path.join(self.directory, filename)
+            if ext == SUITE:
+                if base.endswith(CLEANUP):
+                    base = base.rsplit(CLEANUP, 1)[0]
+                    self.cleanup[base] = fullname
+                else:
+                    self.suites[base] = fullname
+            if ext == CONFIGURATION:
+                self.conf[base] = fullname
+            if ext == TEST:
+                self.tests[base] = fullname
+
+    def name(self):
+        return os.path.split(self.directory)[-1]
+        
 
 # add ability to redirect requests to different hosts
 import monkey
@@ -30,7 +118,7 @@ def define_twill_vars(**kwargs):
     tglobals, tlocals = get_twill_glocals()
     tglobals.update(kwargs)
 
-def read_file_type(name, ext):
+def read_file_type(name, ext): # XXX still needed
     try:
         filename = name_lookup[name + ext]
     except KeyError:
@@ -39,54 +127,14 @@ def read_file_type(name, ext):
         else:
             raise IOError('Unable to locate %s in the search path' % (name + ext))
     return open(filename).read()
-
-def file_exists(name,ext):
-    return name_lookup.has_key(name + ext)
-
-def scan_for_tests(root, recursive=False): 
-    """
-    scans for relevant files in the directory given.
-    """
-    log_info("scanning for tests in '%s'" % root)
-    found = {} 
-
-    if not os.path.isdir(root):
-    	log_warn("Test directory not found (%s). Use -p to specify test search path" % root)
-	return found 
-
-    def check_files(files):
-        for filename in files: 
-            base, ext = os.path.splitext(filename)
-            if ext in (TEST, SUITE, CONFIGURATION):
-                if filename in found: 
-                    log_warn("ignoring %s in %s (already found: %s)" % \
-                         (filename, root, found[filename]))
-                else: 
-                    found[filename] = os.path.join(root, filename)
-                    
-
-    if recursive:
-        # XXX this is DFS, it probably should do BFS ? 
-        for root, dirs, files in os.walk(root): 
-            check_files(files)
-    else: 
-        check_files(os.listdir(root))
-        
-                
-    return found 
-
     
 def list_suites():
-    names = name_lookup.keys()
+    names = name_lookup.suites.keys()
     names.sort()
     
-    found_suite = False 
     for name in names:
         base, ext = os.path.splitext(name)
-        full = name_lookup[name]
-
-        if ext != SUITE or base.endswith(CLEANUP):
-            continue
+        full = name_lookup.suites[name]
         found_suite = True 
         print '%s' % base
         print '  from %s' % rel_filename(full)
@@ -102,7 +150,8 @@ def list_suites():
                 break
             line = line.lstrip('# ')
             print '    %s' % line
-    if not found_suite:
+            
+    if not names:
         print "No suites found"
 
 def rel_filename(filename, relative_to=None):
@@ -120,8 +169,11 @@ def rel_filename(filename, relative_to=None):
     else:
         return filename
 
-def read_configuration(name): 
-    conftext = read_file_type(name, CONFIGURATION)
+def read_configuration(name):
+    filename = current_namespace[-1].conf.get(name)
+    if filename is None:
+        filename = name
+    conftext = file(filename).read()
     lines = conftext.split('\n')
     output = []
     for line in lines:
@@ -134,17 +186,11 @@ def read_configuration(name):
             output.append(line)
     return '\n'.join(output)
 
-def read_suite(name): 
-    return read_file_type(name, SUITE)
-
-def read_test(name): 
-    return read_file_type(name, TEST)
+def read_test(name):
+    return file(current_namespace[-1].tests[name]).read()
 
 def has_cleanup_handler(name):
-    return file_exists(name + CLEANUP, SUITE)
-
-def read_cleanup_for(name):
-    return read_file_type(name + CLEANUP, SUITE)
+    return current_namespace[-1].cleanup.has_key(name)
 
 def parse_suite(suite_data): 
     lineno = 0 
@@ -237,11 +283,11 @@ def do_cleanup_for(name):
     if has_cleanup_handler(name) and not options.no_cleanup_mode: 
         log_info("running cleanup handler for %s" % name)
         try:
-            suite_data = read_cleanup_for(name)
+            suite_data = file(current_namespace[-1].cleanup[name]).read()
             calls = parse_suite(suite_data)
             for script,args,line in calls:
                 try:
-                    if file_exists(script,SUITE):
+                    if current_namespace[-1].suites.get(script):
                         log_warn("Cannot call sub-suite %s during cleanup at %s(%d)" % (script,name,line))
                     else:
                         log_info("running cleanup: %s" % name)
@@ -269,8 +315,9 @@ def load_overrides():
     if CONFIG_OVERRIDE_DICT:
         define_twill_vars(**CONFIG_OVERRIDE_DICT)
 
-def load_configuration(name): 
-    if file_exists(name,CONFIGURATION):
+def load_configuration(name):
+    filename = current_namespace[-1].conf.get(name)
+    if filename:
         try: 
             configuration = read_configuration(name)
             twill.execute_string(configuration, no_reset=1)
@@ -292,7 +339,7 @@ def run_suite(name):
             output_stream.indent()
         try:
         
-            suite_data = read_suite(name)
+            suite_data = file(current_namespace[-1].suites[name]).read()
             calls = parse_suite(suite_data)
         
             load_configuration(name)
@@ -314,37 +361,52 @@ def run_suite(name):
         output_stream.outdent()
 
 def run_test(name,args):
-    if file_exists(name, SUITE):
-        if args:
-            log_warn("Arguments provided to suites are ignored! [%s%s]" 
-                 % (name,args))
-        return run_suite(name)
-    elif file_exists(name, TEST): 
-
-        # don't do anything in cleanup only mode 
-        if options.cleanup_mode:
-            return []
-
-        try:
-            log_info("running test: %s" % name)
-            output_stream.indent()
-            try:            
-                script = read_test(name)
-                script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
-                twill.execute_string(script, no_reset=1)
-                return []
-            except IOError, e: 
-                handle_exception("Unable to read test '%s'" % (name + TEST), e)
-                return [name]
-            except Exception, e: 
-                handle_exception("Error running %s" % name, e)
-                return [name]
-        finally:
-            output_stream.outdent()
+    global current_namespace
+    if name.startswith('.'):
+        namespace = name_lookup # global namespace
+        name = name[1:]
     else:
+        namespace = current_namespace[-1]
+
+    # this pushes the correct namespace on the stack
+    # should be popped
+    test = namespace.lookup(name)
+    if test is None:
         raise NameError("Unable to locate %s or %s in search path" %
                         (name + TEST, name + SUITE))
+    name = test
 
+    current = current_namespace[-1]
+    try:
+        if current.suites.get(name):
+            if args:
+                log_warn("Arguments provided to suites are ignored! [%s%s]" 
+                         % (name,args))
+            return run_suite(name)
+        elif current.tests.get(name):
+
+            # don't do anything in cleanup only mode 
+            if options.cleanup_mode:
+                return []
+
+            try:
+                log_info("running test: %s" % name)
+                output_stream.indent()
+                try:            
+                    script = file(current.tests[name]).read()
+                    script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
+                    twill.execute_string(script, no_reset=1)
+                    return []
+                except IOError, e: 
+                    handle_exception("Unable to read test '%s'" % (name + TEST), e)
+                    return [name]
+                except Exception, e: 
+                    handle_exception("Error running %s" % name, e)
+                    return [name]
+            finally:
+                output_stream.outdent()
+    finally:
+        current_namespace.pop()
 
 def die(message, parser=None):
     message = str(message)
@@ -367,7 +429,10 @@ def main(argv=None):
     options, args = parser.parse_args(argv)
 
     global name_lookup
-    name_lookup = scan_for_tests(os.path.expanduser(options.search_path), options.recursive)
+    directory = os.path.expanduser(options.search_path)
+    name_lookup = Namespace(directory)
+    global current_namespace
+    current_namespace = [name_lookup]
 
     if options.list_suites:
         list_suites()
