@@ -47,7 +47,8 @@ class Namespace(object):
         self.base_dir = base_dir
         self.scan_for_tests()
         files = [ os.path.join(self.directory, i)
-                  for i in os.listdir(self.directory) ]
+                  for i in os.listdir(self.directory) 
+                  if not i.startswith('.') ] # don't include dotfiles
         self.namespaces = [ Namespace(i, base_dir) 
                             for i in files
                             if os.path.isdir(i) ]
