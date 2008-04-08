@@ -1,5 +1,5 @@
 
-you should be able to setup.py develop into a working env, 
+you should be able to setup.py develop into a working env or virtual env, 
 after that: 
 
 There is a firefox extension that allows you to record tests directly
@@ -52,7 +52,5 @@ a suite of tests are contained in
 suite configurations are contained in
 <suite>.conf 
 
-
-
-
-
+cleanup suites are ran after a suite, and are in
+<suite>_cleanup.tsuite

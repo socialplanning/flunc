@@ -1,0 +1,32 @@
+Tue Apr  8 12:47:34 EDT 2008: jhammel
+Added hierarchal namespaces to tests
+Formerly, tests lived in a flat namespace.  Using --recursive, one
+could put all tests under the root directory into a single namespace.
+Now each directory has a namespace associated with it.  Tests or
+suites with single names refer to items in the same namespace (that
+is, the same directory).  You may refer to the bar test or suite in
+the foo subdirectory as 
+
+foo.bar
+
+If a suite has the same name as the subdirectory name, you may refer
+to it either with the full specification
+
+foo.foo
+
+or with shorthand
+
+foo
+
+To refer to the global namespace, preface the name of the test, suite,
+or path with a dot
+
+.foo.bar
+
+refers to the bar suite or test under the foo directory under the root
+directory.  
+
+These changes should be backwards compatible with existing tests and
+were made to facilitate test organization with the hope of providing
+the flexibility to manipulate namespaces when tests live in multiple
+locations on disc.
