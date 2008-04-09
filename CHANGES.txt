@@ -1,3 +1,17 @@
+Tue Apr  9 17:30:00 EDT 2008: rmarianski
+Added twill extension to support xpath. This introduces a dependency on lxml.
+There are 2 functions added: run_xpath and find_in_xpath
+run_xpath parses the html of the current page and saves it in the
+__xpath_result__ local variable.
+find_in_xpath executes the find command on the result of previous xpath
+expression.
+For example:
+extend_with flunc.xpath
+run_xpath "//div[@id='oc-pageNav']"
+find_in_xpath "People"
+
+
+=======
 Wed Apr  9 14:56:08 EDT 2008: jhammel
 Altered the namespace behavior;  now, there is no leading dot to
 specify the global namespace.  Instead, we use a scope-based model:
