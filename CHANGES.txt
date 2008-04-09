@@ -1,14 +1,10 @@
 Tue Apr  9 17:30:00 EDT 2008: rmarianski
 Added twill extension to support xpath. This introduces a dependency on lxml.
-There are 2 functions added: run_xpath and find_in_xpath
-run_xpath parses the html of the current page and saves it in the
-__xpath_result__ local variable.
-find_in_xpath executes the find command on the result of previous xpath
-expression.
+There is 1 function added: find_in_xpath
+find_in_xpath runs a find command on the html result of an xpath expression
 For example:
 extend_with flunc.xpath
-run_xpath "//div[@id='oc-pageNav']"
-find_in_xpath "People"
+find_in_xpath "People" "//div[@id='oc-pageNav']"
 
 
 =======
