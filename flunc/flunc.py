@@ -104,7 +104,7 @@ class Namespace(object):
 
         # if not found in the current namespace, try the global
         if self.base is not self:
-            return self.base.lookup(PATH_SEP.join(path), set_current=set_current, types)
+            return self.base.lookup(PATH_SEP.join(path), set_current=set_current, types=types)
 
 
     def flatten(self):
