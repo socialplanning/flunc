@@ -1,3 +1,20 @@
+Wed Apr  9 14:56:08 EDT 2008: jhammel
+Altered the namespace behavior;  now, there is no leading dot to
+specify the global namespace.  Instead, we use a scope-based model:
+
+1. items (tests, suites, configuration) is first looked up relavent to
+the current (local) namespace
+
+2. if they are not found locally, they are looked up in the global namespace
+
+The dot is still used for namespace separation.  So looking up foo.bar
+will first look for the namespace foo in the local namespace;  if this
+exists, it will try to look up bar in that.  If foo is not a namespace
+relavent to the current one, it will try to look up foo.bar in the
+global namespace.
+
+----
+
 Tue Apr  8 12:47:34 EDT 2008: jhammel
 Added hierarchal namespaces to tests
 Formerly, tests lived in a flat namespace.  Using --recursive, one
