@@ -72,7 +72,7 @@ class Namespace(object):
         else:
             ns = namespace.namespaces.get(path[0])
             if ns:
-                return ns.lookup(PATH_SEP.join(path[1:]))
+                return ns.get(PATH_SEP.join(path[1:]), _type=_type)
 
     def lookup(self, path, set_current=True, types=('suites', 'tests')):
         """
@@ -199,7 +199,7 @@ def read_configuration(name):
             for includename in tokens[1:]:
                 _includename = current_namespace[-1].get(includename, _type='conf')
                 if _includename is None:
-                    log_error('including configuration file %s from %s not found' % ( includename, name ))
+                    raise NameError('including configuration file %s from %s not found' % ( includename, name ))
                 else:
                     log_info('including config %s' % includename)
                     output.append(read_configuration(_includename))
@@ -208,7 +208,10 @@ def read_configuration(name):
     return '\n'.join(output)
 
 def read_test(name):
-    return file(current_namespace[-1].get(name, _type='tests')).read()
+    filename = current_namespace[-1].get(name, _type='tests')
+    if filename is None:
+        raise NameError('test %s not found' % name)
+    return file(filename).read()
 
 def has_cleanup_handler(name):
     return current_namespace[-1].cleanup.has_key(name)
