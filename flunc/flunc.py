@@ -25,31 +25,33 @@ name_lookup = {}
 class Namespace(object):
 
 
-    def __init__(self, directory, base_dir=None):
+    def __init__(self, directory, base_namespace=None):
 
         # tests, suites, and associated data
         self.tests = {}
         self.suites = {}
         self.conf = {}
         self.cleanup = {}
+        self.data = ( 'tests', 'suites', 'conf', 'cleanup' )
 
         self.directory = directory
 
-        # XXX is base_dir needed?  its not used
-        if base_dir is None: 
-            base_dir = directory
+        # if the base namespace is not specified, 
+        # then this namespace is top-level
+        if base_namespace is None: 
+            base_namespace = self
 
         if not os.path.isdir(directory):
             log_warn("Test directory not found (%s). Use -p to specify test search path" % directory)
             # raise SomeThing
             return
 
-        self.base_dir = base_dir
+        self.base = base_namespace
         self.scan_for_tests()
         files = [ os.path.join(self.directory, i)
                   for i in os.listdir(self.directory) 
                   if not i.startswith('.') ] # don't include dotfiles
-        self.namespaces = [ Namespace(i, base_dir) 
+        self.namespaces = [ Namespace(i, base_namespace) 
                             for i in files
                             if os.path.isdir(i) ]
         self.namespaces = [ i for i in self.namespaces
@@ -58,21 +60,19 @@ class Namespace(object):
                                 for i in self.namespaces])
 
     def get(self, path, _type):
-        if path.startswith(PATH_SEP):
-            namespace = name_lookup
-            path = path[1:]
-        else:
-            namespace = self # XXX bad?
         path = path.split(PATH_SEP)
         if len(path) == 1:
-            path = path[0]
-            item = getattr(namespace, _type).get(path)
+            item = getattr(self, _type).get(path[0])
             if item:
                 return item
         else:
-            ns = namespace.namespaces.get(path[0])
+            ns = self.namespaces.get(path[0])
             if ns:
                 return ns.get(PATH_SEP.join(path[1:]), _type=_type)
+
+        # if not found in the current namespace, try the global
+        if self.base is not self:
+            return self.base.get(PATH_SEP.join(path), _type)
 
     def lookup(self, path, set_current=True, types=('suites', 'tests')):
         """
@@ -83,25 +83,41 @@ class Namespace(object):
         global current_namespace
         path = path.split(PATH_SEP)
         if len(path) == 1:
-            path = path[0]
             for _type in types:
-                item = getattr(self, _type).get(path)
+                item = getattr(self, _type).get(path[0])
                 if item:
                     if set_current:
                         current_namespace.append(self)
-                    return path
+                    return path[0]
                 elif _type == 'suites': # XXX hack
-                    ns = self.namespaces.get(path)
+                    ns = self.namespaces.get(path[0])
                     if ns:
-                        suite = ns.suites.get(path)
+                        suite = ns.suites.get(path[0])
                         if suite:
                             if set_current:  # XXX this should be true here
                                 current_namespace.append(ns)
-                            return path
+                            return path[0]
         else:
             ns = self.namespaces.get(path[0])
             if ns:
                 return ns.lookup(PATH_SEP.join(path[1:]))
+
+        # if not found in the current namespace, try the global
+        if self.base is not self:
+            return self.base.lookup(PATH_SEP.join(path), set_current=set_current, types)
+
+
+    def flatten(self):
+        """flattens the namespace"""
+        for namespace in self.namespaces.values():
+            namespace.flatten()
+
+            # updat the data
+            for item in self.data:
+                getattr(self, item).update(getattr(namespace, item))
+
+        # delete the namespaces
+        self.namespaces = {} 
 
     def scan_for_tests(self): 
         """
@@ -135,7 +151,7 @@ def define_twill_vars(**kwargs):
     tglobals, tlocals = get_twill_glocals()
     tglobals.update(kwargs)
 
-def read_file_type(name, ext): # XXX still needed
+def read_file_type(name, ext): # XXX still needed?
     try:
         filename = name_lookup[name + ext]
     except KeyError:
@@ -385,16 +401,10 @@ def run_suite(name):
         output_stream.outdent()
 
 def run_test(name,args):
-    global current_namespace
-    if name.startswith('.'):
-        namespace = name_lookup # global namespace
-        name = name[1:]
-    else:
-        namespace = current_namespace[-1]
 
     # this pushes the correct namespace on the stack
     # should be popped
-    test = namespace.lookup(name)
+    test = current_namespace[-1].lookup(name)
     if test is None:
         raise NameError("Unable to locate %s or %s in search path" %
                         (name + TEST, name + SUITE))
@@ -457,6 +467,9 @@ def main(argv=None):
     name_lookup = Namespace(directory)
     global current_namespace
     current_namespace = [name_lookup]
+
+    if options.recursive:
+        name_lookup.flatten()
 
     if options.list_suites:
         list_suites()
@@ -553,10 +566,11 @@ def main(argv=None):
 
 def get_optparser():
     base_dir = os.path.dirname(os.path.dirname(__file__))
-    ftest_dir = rel_filename(os.path.join(base_dir, 'ftests'))
-    if not ftest_dir.startswith(os.path.sep):
+#    ftest_dir = rel_filename(os.path.join(base_dir, 'ftests')) # does not exist
+#    if not ftest_dir.startswith(os.path.sep):
         # Suppress optparse's word wrapping:
-        ftest_dir = '.'+os.path.sep+ftest_dir
+#        ftest_dir = '.'+os.path.sep+ftest_dir
+    ftest_dir = '.'
     usage = "usage: %prog [options] <test name> [test name...]"
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('-t', '--host',
@@ -584,7 +598,7 @@ def get_optparser():
     parser.add_option('-r', '--recursive',
                       dest='recursive',
                       action='store_true',
-                      help="search recursively for tests in the search path")
+                      help="search recursively for tests in the search path and puts them in a flat namespace")
     parser.add_option('-v', '--verbose',
                       dest='verbose',
                       action='store_true',
