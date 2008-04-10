@@ -1,3 +1,9 @@
+Thu Apr 10 14:35:00 EDT 2008: pw
+Don't display BadRequest exceptions when calling zope_delobject();
+those are normal and just add a lot of noise.
+
+=======
+
 Tue Apr  9 17:30:00 EDT 2008: rmarianski
 Added twill extension to support xpath. This introduces a dependency on lxml.
 There is 1 function added: find_in_xpath
