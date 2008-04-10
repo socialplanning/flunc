@@ -28,7 +28,7 @@ def _run_xpath(xpath):
     #one result
     if results:
         if len(results) > 1:
-            log_warn("xpath '%s' found multiple results: using all of them")
+            log_warn("xpath '%s' found multiple results: using all of them" % xpath)
         result = '\n'.join(lxml.html.tostring(r) for r in results)
     else:
         log_error("xpath '%s' found no results")
@@ -58,6 +58,6 @@ def notfind_in_xpath(what, xpath):
         find_in_xpath(what, xpath)
     except TwillAssertionError:
         return
-    raise TwillAssertionError("match to '%s' in '%s'" % (what, xpath_result))
+    raise TwillAssertionError("match to '%s' in %s" % (what, repr(xpath)))
 
 #XXX add a find_last_xpath to make re-running finds on xpaths easier
