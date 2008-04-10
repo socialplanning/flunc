@@ -1,6 +1,7 @@
 import twill 
 from twill.namespaces import get_twill_glocals 
-from xmlrpclib import Server as XMLRPCServer 
+from xmlrpclib import Server as XMLRPCServer
+from xmlrpclib import Fault
 import urllib 
 from logging import log_error, log_warn
 from flunc import options
@@ -13,7 +14,7 @@ def get_twill_var(varname):
     twill_globals, twill_locals = get_twill_glocals()
     return twill_globals.get(varname)
 
-def zope_delobject(container, obj, admin_user, admin_pw): 
+def zope_delobject(container, obj, admin_user, admin_pw):
     # use a the 'cleanup_base_url', which may be different than the base_url
     base_url = get_twill_var('cleanup_base_url')
     prepath = get_twill_var('prepath')
@@ -28,7 +29,12 @@ def zope_delobject(container, obj, admin_user, admin_pw):
     portal = XMLRPCServer(auth_url)
     try:
         getattr(portal, container).manage_delObjects([obj])
-    except:
-        if options.verbose:
+    except Fault, e:
+        ignorable = '%s does not exist' % obj
+        if str(e).count(ignorable):
+            log_warn("(zope) can't delete %s, it didn't exist" % uri)
+        elif options.verbose:
             raise
-        log_error("Error removing '%s' from '%s'" % (obj, container))
+        else:
+            log_error("Error removing '%s' from '%s': %s" % (obj, container, str(e)))
+
