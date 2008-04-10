@@ -32,7 +32,7 @@ def zope_delobject(container, obj, admin_user, admin_pw):
     except Fault, e:
         ignorable = '%s does not exist' % obj
         if str(e).count(ignorable):
-            log_warn("(zope) can't delete %s/%s/%s, it didn't exist" % (uri, container, obj)
+            log_warn("(zope) can't delete %s/%s/%s, it didn't exist" % (uri, container, obj))
         elif options.verbose:
             raise
         else:
