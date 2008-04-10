@@ -8,7 +8,7 @@ from lxml.etree import XPathEvalError
 import lxml.html
 import re
 
-__all__ = ['find_in_xpath']
+__all__ = ['find_in_xpath', 'notfind_in_xpath']
 
 
 def _run_xpath(xpath):
@@ -53,5 +53,11 @@ def find_in_xpath(what, xpath):
         match_str = m.group(0)
     twill_locals['__match__'] = match_str
 
-#XXX add a notfind_in_xpath?
+def notfind_in_xpath(what, xpath):
+    try:
+        find_in_xpath(what, xpath)
+    except TwillAssertionError:
+        return
+    raise TwillAssertionError("match to '%s' in '%s'" % (what, xpath_result))
+
 #XXX add a find_last_xpath to make re-running finds on xpaths easier
