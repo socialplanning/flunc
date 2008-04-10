@@ -31,8 +31,8 @@ def make_dict_from_call(raw_str, globals_dict):
         return {}
 
 
-def make_twill_local_defs(vars): 
-    return '\n'.join("setlocal %s '%s'" % (k,v) for k,v in vars.items()) + '\n'
+def make_twill_local_defs(vars):    
+    return '\n'.join("setlocal %s %s" % (k,repr(v)) for k,v in vars.items()) + '\n'
 
 
 # valid regular expressions include name of test or suite
