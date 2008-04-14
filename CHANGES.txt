@@ -1,8 +1,12 @@
+===
+0.2
+===
+
 Thu Apr 10 14:35:00 EDT 2008: pw
 Don't display BadRequest exceptions when calling zope_delobject();
 those are normal and just add a lot of noise.
 
-=======
+----
 
 Tue Apr  9 17:30:00 EDT 2008: rmarianski
 Added twill extension to support xpath. This introduces a dependency on lxml.
@@ -12,8 +16,8 @@ For example:
 extend_with flunc.xpath
 find_in_xpath "People" "//div[@id='oc-pageNav']"
 
+----
 
-=======
 Wed Apr  9 14:56:08 EDT 2008: jhammel
 Altered the namespace behavior;  now, there is no leading dot to
 specify the global namespace.  Instead, we use a scope-based model:

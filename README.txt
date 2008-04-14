@@ -1,56 +1,64 @@
+Flunc: a functional test suite runner.
 
-you should be able to setup.py develop into a working env or virtual env, 
-after that: 
+Writing tests
+=============
+
+You should be able to ``python setup.py develop`` into a workingenv
+or virtualenv; after that ...
 
 There is a firefox extension that allows you to record tests directly
-from within your browser. To install:
-* http://developer.spikesource.com/wiki/index.php/Projects:TestGen4Web
+from within your browser. To install, visit
 
-These tests are saved in an xml format. You
-can convert these tests into a twill script by executing:
-testgentotwill recorded.html > twillscript.twill
+ * http://developer.spikesource.com/wiki/index.php/Projects:TestGen4Web
+
+These tests are saved in an xml format. You can convert these tests
+into a twill script by executing
+
+ ``testgentotwill recorded.html > twillscript.twill``
 
 Of course, you can still write tests manually. The individual tests
 are themselves twill scripts.
 
+Running tests
+=============
 
-flunc --help for details on running the functional tests
+Run ``flunc --help`` for details on running the functional tests.
 
+By default flunc will search ./ftests/ to find tests. You can change
+this with the ``-p`` (``--path``) option.
 
-by default flunc will search ./ftests/ to find tests. you can 
-change this with the -p (--path) option 
+ ``flunc all``
 
+runs all tests listed in all.tsuite against localhost:8080/openplans
 
-flunc all 
+ ``flunc -t http://localhost:8080/some_portal all``
 
-[runs all tests listed in all.tsuite against localhost:8080/openplans]
+runs all tests listed in all.tsuite against localhost:8080/some_portal
 
+ ``flunc -t http://localhost:8080/p -c all create_user``
 
-flunc -t http://localhost:8080/some_portal all 
-[runs all tests listed in all.tsuite against localhost:8080/some_portal]
+runs create_user.twill using all.conf
 
-or 
+ ``flunc -c all create_user login create_project destroy_project destroy_user``
 
-flunc -t http://localhost:8080/p -c all create_user
+specify an ad hoc suite creating and tearing down a user and project
+on default host
 
-(runs create_user.twill using all.conf) 
+Finding tests
+=============
 
-or 
+Individual tests are contained in 
 
-flunc -c all create_user login create_project destroy_project destroy_user
+ <test>.twill 
 
-(specify an ad hoc suite creating and tearing down a user and project
- on default host) 
+A suite of tests are contained in 
 
+ <suite>.tsuite 
 
-individual tests are contained in 
-<test>.twill 
+Suite configurations are contained in
 
-a suite of tests are contained in 
-<suite>.tsuite 
+ <suite>.conf 
 
-suite configurations are contained in
-<suite>.conf 
+Cleanup suites are run after a suite, and are in
 
-cleanup suites are ran after a suite, and are in
-<suite>_cleanup.tsuite
+ <suite>_cleanup.tsuite
