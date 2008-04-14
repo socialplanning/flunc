@@ -2,18 +2,21 @@ __version__ = '0.2'
 
 from setuptools import setup, find_packages
 
+f = open('README.txt')
+readme = "".join(f.readlines())
+f.close()
+
 setup(name="flunc",
       version=__version__,
       description="Functional test suite runner",
-      long_description="""\
-""",
+      long_description=readme,
       classifiers=[
         # dev status, license, HTTP categories
         ],
       keywords='',
       author="The Open Planning Project",
-      author_email="",
-      url="",
+      author_email="flunc-dev@lists.openplans.org",
+      url="http://www.openplans.org/projects/flunc",
       license="GPL",
       packages=find_packages(exclude=[]),
       zip_safe=False,
