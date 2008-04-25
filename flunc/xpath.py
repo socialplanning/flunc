@@ -42,7 +42,9 @@ def _run_xpath(xpath):
 def find_in_xpath(what, xpath):
     _, twill_locals = get_twill_glocals()
     xpath_result = _run_xpath(xpath)
-    regexp = re.compile(what)
+    #XXX we just ignore case for now
+    #if we need to differentiate then we can pass in a flag
+    regexp = re.compile(what, re.IGNORECASE)
     m = regexp.search(xpath_result)
     if not m:
         raise TwillAssertionError("no match to '%s' in '%s'" %
