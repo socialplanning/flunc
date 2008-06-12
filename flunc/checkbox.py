@@ -6,7 +6,7 @@ try:
 except ImportError:
     from twill.other_packages._mechanize_dist import ClientForm
 
-__all__ = ['edit_checkbox', 'check_group_values', 'has_multiple_values', 'is_disabled']
+__all__ = ['edit_checkbox', 'check_group_values', 'has_multiple_values', 'is_disabled', 'is_selected']
 
 def check_group_values(formname, name, values_str):
     """
@@ -52,3 +52,17 @@ def is_disabled(formname, name, value=None):
         return
     if not control.disabled:
         raise TwillAssertionError("input %r not disabled!" % name)
+
+def is_selected(formname, name, value):
+    """Raise an exception if the control option with the given value
+    is not selected.
+    (Useful eg. for making assertions about form defaults.)
+    """
+    browser = twill.get_browser()
+    form = browser.get_form(formname)
+    if not form:
+        raise TwillAssertionError("no matching forms!")
+    control = browser.get_form_field(form, name)
+    if not control.get(value)._selected:
+        raise TwillAssertionError("%r option %r not selected!" % (name, value))
+
