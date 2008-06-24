@@ -1,6 +1,16 @@
 ===
+0.3 (UNRELEASED)
+===
+
+Thu Jun 12 17:54:00 EDT 2008: pw
+Add a twill extension (flunc.checkbox.is_selected) for making assertions about
+form defaults.
+
+
+===
 0.2
 ===
+
 
 Thu Apr 10 14:35:00 EDT 2008: pw
 Don't display BadRequest exceptions when calling zope_delobject();
