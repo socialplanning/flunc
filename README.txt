@@ -1,10 +1,18 @@
 Flunc: a functional test suite runner.
 
+
+Installation
+============
+
+We recommend installing into a Virtualenv_.
+
+You should be able to install flunc by using ``easy_install flunc``; or 
+you can download the tarball, extract, and run ``python setup.py develop``.  
+
 Writing tests
 =============
 
-You should be able to ``python setup.py develop`` into a workingenv
-or virtualenv; after that ...
+Flunc tests are Twill_ scripts.
 
 There is a firefox extension that allows you to record tests directly
 from within your browser. To install, visit
@@ -16,8 +24,8 @@ into a twill script by executing
 
  ``testgentotwill recorded.html > twillscript.twill``
 
-Of course, you can still write tests manually. The individual tests
-are themselves twill scripts.
+Of course, you can still write tests manually.
+
 
 Running tests
 =============
@@ -26,6 +34,8 @@ Run ``flunc --help`` for details on running the functional tests.
 
 By default flunc will search ./ftests/ to find tests. You can change
 this with the ``-p`` (``--path``) option.
+
+Some examples:
 
  ``flunc all``
 
@@ -62,3 +72,12 @@ Suite configurations are contained in
 Cleanup suites are run after a suite, and are in
 
  <suite>_cleanup.tsuite
+
+More details are on the `Flunc homepage`_.
+
+.. _Virtualenv: http://pypi.python.org/pypi/virtualenv
+
+.. _Twill: http://pypi.python.org/pypi/twill
+
+.. _`Flunc homepage`: http://www.openplans.org/projects/flunc
+
