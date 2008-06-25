@@ -39,13 +39,13 @@ Some examples:
 
  ``flunc all``
 
-runs all tests listed in all.tsuite against localhost:8080/openplans
+runs all tests listed in all.tsuite against http://localhost/
 
  ``flunc -t http://localhost:8080/some_portal all``
 
 runs all tests listed in all.tsuite against localhost:8080/some_portal
 
- ``flunc -t http://localhost:8080/p -c all create_user``
+ ``flunc -c all create_user``
 
 runs create_user.twill using all.conf
 

@@ -576,7 +576,7 @@ def get_optparser():
     parser.add_option('-t', '--host',
                       help='specifies the base url of the portal to test [default: %default]',
                       dest='base_url',
-                      default='http://localhost:8080/openplans')
+                      default='http://localhost/')
     parser.add_option('-T', '--cleanup-host',
                       help='specifies the base url of the portal to run the cleanup scripts against [default: base_url]',
                       dest='cleanup_base_url',
