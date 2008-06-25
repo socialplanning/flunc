@@ -1,3 +1,11 @@
+
+==
+0.4 (UNRELEASED)
+===
+
+Wed Jun 25 11:32:28 EDT 2008: pw
+Change default host to http://localhost.
+
 ===
 0.3
 ===
