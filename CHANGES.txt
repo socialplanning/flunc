@@ -3,6 +3,10 @@
 0.4 (UNRELEASED)
 ===
 
+Thu 18 Dec 2008 02:41:16 PM EST: pw
+Add two twill extensions to checkbox.py: not_selected, is_enabled.
+Change is_selected to work correctly with checkboxes, I think.
+
 Wed Jun 25 11:32:28 EDT 2008: pw
 Change default host to http://localhost.
 

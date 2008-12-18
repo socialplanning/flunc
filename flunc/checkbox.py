@@ -6,7 +6,10 @@ try:
 except ImportError:
     from twill.other_packages._mechanize_dist import ClientForm
 
-__all__ = ['edit_checkbox', 'check_group_values', 'has_multiple_values', 'is_disabled', 'is_selected']
+__all__ = ['edit_checkbox', 'check_group_values', 'has_multiple_values', 
+           'is_disabled', 'is_selected', 
+           'is_enabled', 'not_selected', 'not_enabled',
+]
 
 def check_group_values(formname, name, values_str):
     """
@@ -53,7 +56,7 @@ def is_disabled(formname, name, value=None):
     if not control.disabled:
         raise TwillAssertionError("input %r not disabled!" % name)
 
-def is_selected(formname, name, value):
+def is_selected(formname, name, value=None):
     """Raise an exception if the control option with the given value
     is not selected.
     (Useful eg. for making assertions about form defaults.)
@@ -63,6 +66,29 @@ def is_selected(formname, name, value):
     if not form:
         raise TwillAssertionError("no matching forms!")
     control = browser.get_form_field(form, name)
-    if not control.get(value)._selected:
-        raise TwillAssertionError("%r option %r not selected!" % (name, value))
+    if control.type == 'checkbox':
+        # Not totally sure about this; I find the ClientForm API weird.
+        if not control.value:
+            raise TwillAssertionError("%r checkbox not selected!" % (name))
+    else:
+        if value is None:
+            raise TypeError("Controls other than checkbox require a value.XXX")
+        if not control.get(value)._selected:
+            raise TwillAssertionError("%r option %r not selected!" % (name, value))
 
+# I wish twill had a generic NOT operator.
+def not_selected(*args):
+    try:
+        is_selected(*args)
+    except TwillAssertionError:
+        return
+    raise TwillAssertionError
+
+def is_enabled(*args):
+    try:
+        is_disabled(*args)
+    except TwillAssertionError:
+        return
+    raise TwillAssertionError
+
+not_enabled = is_disabled
