@@ -1,9 +1,12 @@
 __version__ = '0.4'
 
-from setuptools import setup, find_packages
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup
 
 f = open('README.txt')
-readme = "".join(f.readlines())
+readme = "\\\n" + "".join(f.readlines())
 f.close()
 
 setup(name="flunc",
@@ -11,7 +14,12 @@ setup(name="flunc",
       description="Functional test suite runner",
       long_description=readme,
       classifiers=[
-        # dev status, license, HTTP categories
+        # see http://pypi.python.org/pypi?%3Aaction=list_classifiers
+        "Topic :: Software Development :: Testing",
+        'Topic :: Internet :: WWW/HTTP',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Intended Audience :: Developers',
+        'Development Status :: 5 - Production/Stable',
         ],
       keywords='',
       author="The Open Planning Project",

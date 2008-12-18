@@ -1,4 +1,4 @@
-Flunc: a functional test suite runner.
+Flunc: a functional test suite runner for web applications.
 
 
 Installation
