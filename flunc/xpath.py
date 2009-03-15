@@ -7,9 +7,31 @@ from logging import log_error, log_warn
 from lxml.etree import XPathEvalError
 import lxml.html
 import re
+from lxml.cssselect import CSSSelector
 
-__all__ = ['find_in_xpath', 'notfind_in_xpath']
+__all__ = ['find_in_xpath', 'notfind_in_xpath', 'find_in_css']
 
+def find_in_css(what, css):
+    _, twill_locals = get_twill_glocals()
+    browser = get_browser()
+    html = browser.get_html()
+    tree = lxml.html.document_fromstring(html)
+    sel = CSSSelector(css)
+    results = sel(tree)
+    results = '\n'.join(lxml.html.tostring(r)
+                        for r in results)
+
+    regexp = re.compile(what, re.IGNORECASE)
+    m = regexp.search(results)
+    if not m:
+        raise TwillAssertionError("no match to '%s' in '%s'" %
+                                  (what, results))
+
+    if m.groups():
+        match_str = m.group(1)
+    else:
+        match_str = m.group(0)
+    twill_locals['__match__'] = match_str
 
 def _run_xpath(xpath):
     _, twill_locals = get_twill_glocals()
