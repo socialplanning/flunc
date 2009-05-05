@@ -1,5 +1,5 @@
 ===
-0.5 (UNRELEASED)
+0.5
 ===
 
 Sun 15 Mar 2009 3:31:59 PM EST: egj
