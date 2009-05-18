@@ -7,7 +7,7 @@ from logging import log_error, log_warn
 from flunc import options
 
 
-__all__ = ['zope_delobject']
+__all__ = ['zope_delobject', 'opencore_user_cleanup']
 
 
 def get_twill_var(varname): 
@@ -37,4 +37,25 @@ def zope_delobject(container, obj, admin_user, admin_pw):
             raise
         else:
             log_error("Error removing '%s' from '%s': %s" % (obj, container, str(e)))
+
+
+def opencore_user_cleanup(admin_user, admin_pw):
+    globals, locals = get_twill_glocals()
+
+    base_url = globals.get('base_url')
+    prepath = globals.get('prepath')
+
+    log_warn("(zope) Cleaning up local roles for %s" % (base_url))
+
+    scheme, uri = urllib.splittype(base_url)
+    host, path = urllib.splithost(uri)
+    if prepath is not None:
+        path = prepath + path
+    auth_url = "%s://%s:%s@%s%s/" % (scheme, admin_user, admin_pw, host, path)
+    portal = XMLRPCServer(auth_url)
+
+    try:
+        getattr(portal, 'member-postdelete-cleanup')()
+    except Fault, e:
+        log_warn("could not clean up local roles, maybe your version of opencore doesn't support it?")
 
