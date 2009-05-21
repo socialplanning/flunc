@@ -2,6 +2,10 @@
 0.6
 ===
 
+Thu 21 May 2009 12:44:49 PM EST: egj
+Add an extension module flunc.urlinspector with a command `url_qs`
+for making simple assertions about the current url's query string
+
 Thu 21 May 2009 12:01:49 PM EST: egj
 Add a `notfind_in_css` extension to flunc.xpath
 
