@@ -9,7 +9,7 @@ import lxml.html
 import re
 from lxml.cssselect import CSSSelector
 
-__all__ = ['find_in_xpath', 'notfind_in_xpath', 'find_in_css']
+__all__ = ['find_in_xpath', 'notfind_in_xpath', 'find_in_css', 'notfind_in_css']
 
 def find_in_css(what, css):
     _, twill_locals = get_twill_glocals()
@@ -32,6 +32,13 @@ def find_in_css(what, css):
     else:
         match_str = m.group(0)
     twill_locals['__match__'] = match_str
+
+def notfind_in_css(what, css):
+    try:
+        find_in_xpath(what, css)
+    except TwillAssertionError:
+        return
+    raise TwillAssertionError("match to '%s' in %s" % (what, repr(css)))
 
 def _run_xpath(xpath):
     _, twill_locals = get_twill_glocals()
