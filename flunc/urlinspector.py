@@ -13,4 +13,5 @@ def url_qs(what):
         qsdict[q[0]] = q[1]
         
     if what not in qsdict:
-        raise TwillAssertionError("no match to '%s' in %s" % (what, qs)
+        raise TwillAssertionError("no match to '%s' in %s" % (what, qs))
+    
