@@ -1,4 +1,11 @@
 ===
+0.6
+===
+
+Thu 21 May 2009 12:01:49 PM EST: egj
+Add a `notfind_in_css` extension to flunc.xpath
+
+===
 0.5
 ===
 
