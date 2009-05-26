@@ -35,7 +35,7 @@ def find_in_css(what, css):
 
 def notfind_in_css(what, css):
     try:
-        find_in_xpath(what, css)
+        find_in_css(what, css)
     except TwillAssertionError:
         return
     raise TwillAssertionError("match to '%s' in %s" % (what, repr(css)))
