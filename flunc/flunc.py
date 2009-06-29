@@ -436,7 +436,7 @@ def run_test(name,args):
                     script = file(current.tests[name]).read()
                     try:
                         parameters = make_dict_from_call(args,get_twill_glocals()[0])
-                    except (ValueError, TypeError, SyntaxError) e:
+                    except (ValueError, TypeError, SyntaxError), e:
                         e.args = ("\"%s%s\": Only positional argument passing is supported in suites." % \
                                       (name, args), ) + e.args[1:]
                         raise e
