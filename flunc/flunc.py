@@ -332,7 +332,13 @@ def do_cleanup_for(name):
                     else:
                         log_info("running cleanup: %s" % name)
                         script_data = read_test(script)
-                        script_data = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script_data 
+                        try:
+                            parameters = make_dict_from_call(args,get_twill_glocals()[0])
+                        except (ValueError, TypeError, SyntaxError), e:
+                            e.args = ("\"%s%s\": Only positional argument passing is supported in suites." % \
+                                          (name, args), ) + e.args[1:]
+                            raise e
+                        script_data = make_twill_local_defs(parameters) + script_data 
                         twill.execute_string(script_data, no_reset=1)
                 except Exception, e:
                     maybe_print_stack() 
@@ -428,7 +434,13 @@ def run_test(name,args):
                 output_stream.indent()
                 try:            
                     script = file(current.tests[name]).read()
-                    script = make_twill_local_defs(make_dict_from_call(args,get_twill_glocals()[0])) + script 
+                    try:
+                        parameters = make_dict_from_call(args,get_twill_glocals()[0])
+                    except (ValueError, TypeError, SyntaxError) e:
+                        e.args = ("\"%s%s\": Only positional argument passing is supported in suites." % \
+                                      (name, args), ) + e.args[1:]
+                        raise e
+                    script = make_twill_local_defs(parameters) + script
                     twill.execute_string(script, no_reset=1)
                     return []
                 except IOError, e: 
