@@ -6,8 +6,10 @@ except ImportError:
     from distutils.core import setup
 
 f = open('README.txt')
-readme = "\\\n" + "".join(f.readlines())
+changes = open('CHANGES.txt')
+readme = "\\\n" + "".join(f.readlines() + changes.readlines())
 f.close()
+changes.close()
 
 setup(name="flunc",
       version=__version__,
