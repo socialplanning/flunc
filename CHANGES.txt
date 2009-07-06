@@ -6,11 +6,21 @@
 
  * Add `notfind_in_css` command to flunc.xpath (egj)
 
+ * Display a more meaningful error message for invalid argument-passing
+   syntaxes (egj)
+
+ * Add a `zope_cleanup.opencore_user_cleanup` method to flush the opencore
+   member cleanup queue when deleting users. No hard failure if you have a
+   version of opencore that doesn't support this (pw)
+
 0.5 (2009-05-05)
 ================
 
  * Add `find_in_css` command to flunc.xpath module. Use it to find a regex
-   within a given CSS selector, like find_in_xpath. (egj)
+   within a given CSS selector, like find_in_xpath (egj)
+
+ * Transfer binary data directly to the twill script for passed-in param
+   values instead of escaping it as a string (cabraham)
 
 0.4 (2008-12-18)
 ================
