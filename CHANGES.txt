@@ -1,4 +1,4 @@
-0.6 (unreleased)
+0.6 (2009-07-06)
 ================
 
  * Add extension module flunc.urlinspector with a command `url_qs` for
