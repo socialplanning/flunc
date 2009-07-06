@@ -1,4 +1,4 @@
-__version__ = '0.6dev'
+__version__ = '0.6'
 
 try:
     from setuptools import setup, find_packages
@@ -22,9 +22,9 @@ setup(name="flunc",
         'Development Status :: 5 - Production/Stable',
         ],
       keywords='',
-      author="The Open Planning Project",
-      author_email="flunc-dev@lists.openplans.org",
-      url="http://www.openplans.org/projects/flunc",
+      author="The Open Planning Project and contributors",
+      author_email="flunc-dev@lists.coactivate.org",
+      url="http://www.coactivate.org/projects/flunc",
       license="GPL",
       packages=find_packages(exclude=[]),
       zip_safe=False,

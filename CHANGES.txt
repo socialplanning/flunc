@@ -1,109 +1,103 @@
-===
-0.6
-===
+0.6 (2009-07-06)
+================
 
-Thu 21 May 2009 12:44:49 PM EST: egj
-Add an extension module flunc.urlinspector with a command `url_qs`
-for making simple assertions about the current url's query string
+ * Add extension module flunc.urlinspector with a command `url_qs` for
+   making simple assertions about the current url's query string (egj)
 
-Thu 21 May 2009 12:01:49 PM EST: egj
-Add a `notfind_in_css` extension to flunc.xpath
+ * Add `notfind_in_css` command to flunc.xpath (egj)
 
-===
-0.5
-===
+ * Display a more meaningful error message for invalid argument-passing
+   syntaxes (egj)
 
-Sun 15 Mar 2009 3:31:59 PM EST: egj
-Add a twill extension (xpath.find_in_css) for finding a regex
-within a given CSS selector, like find_in_xpath.
+ * Add a `zope_cleanup.opencore_user_cleanup` method to flush the opencore
+   member cleanup queue when deleting users. No hard failure if you have a
+   version of opencore that doesn't support this (pw)
 
-===
-0.4 
-===
+0.5 (2009-05-05)
+================
 
-Thu 18 Dec 2008 02:41:16 PM EST: pw
-Add two twill extensions to checkbox.py: not_selected, is_enabled.
-Change is_selected to work correctly with checkboxes, I think.
+ * Add `find_in_css` command to flunc.xpath module. Use it to find a regex
+   within a given CSS selector, like find_in_xpath (egj)
 
-Wed Jun 25 11:32:28 EDT 2008: pw
-Change default host to http://localhost.
+ * Transfer binary data directly to the twill script for passed-in param
+   values instead of escaping it as a string (cabraham)
 
-===
-0.3
-===
+0.4 (2008-12-18)
+================
 
-Thu Jun 12 17:54:00 EDT 2008: pw
-Add a twill extension (flunc.checkbox.is_selected) for making assertions about
-form defaults.
+ * Add two twill extensions to checkbox.py: `not_selected`, `is_enabled` (pw)
 
+ * Change is_selected to work correctly with checkboxes, I think (pw)
 
-===
-0.2
-===
+ * Change default host to http://localhost (pw)
 
+0.3 (2008-06-25)
+================
 
-Thu Apr 10 14:35:00 EDT 2008: pw
-Don't display BadRequest exceptions when calling zope_delobject();
-those are normal and just add a lot of noise.
+ * Add a twill extension (flunc.checkbox.is_selected) for making assertions
+   about form defaults (pw)
 
-----
+0.2 (2008-04-14)
+================
 
-Tue Apr  9 17:30:00 EDT 2008: rmarianski
-Added twill extension to support xpath. This introduces a dependency on lxml.
-There is 1 function added: find_in_xpath
-find_in_xpath runs a find command on the html result of an xpath expression
-For example:
-extend_with flunc.xpath
-find_in_xpath "People" "//div[@id='oc-pageNav']"
+ * Don't display BadRequest exceptions when calling zope_delobject() -- those
+   are normal and just add a lot of noise (pw)
 
-----
+ * Added twill extension to support xpath. This introduces a dependency on lxml.
+   There is one function added: find_in_xpath (rmarianski)
 
-Wed Apr  9 14:56:08 EDT 2008: jhammel
-Altered the namespace behavior;  now, there is no leading dot to
-specify the global namespace.  Instead, we use a scope-based model:
+   find_in_xpath runs a find command on the html result of an xpath expression
+   For example:
+   {{{
+   extend_with flunc.xpath
+   find_in_xpath "People" "//div[@id='oc-pageNav']"
+   }}}
 
-1. items (tests, suites, configuration) is first looked up relavent to
-the current (local) namespace
+ * Altered the namespace behavior; now there is no leading dot to
+   specify the global namespace. (jhammel)
 
-2. if they are not found locally, they are looked up in the global namespace
+   Instead, we use a scope-based model:
 
-The dot is still used for namespace separation.  So looking up foo.bar
-will first look for the namespace foo in the local namespace;  if this
-exists, it will try to look up bar in that.  If foo is not a namespace
-relavent to the current one, it will try to look up foo.bar in the
-global namespace.
+   1. items (tests, suites, configuration) is first looked up relavent to
+      the current (local) namespace
 
-----
+   2. if they are not found locally, they are looked up in the global namespace
 
-Tue Apr  8 12:47:34 EDT 2008: jhammel
-Added hierarchal namespaces to tests
-Formerly, tests lived in a flat namespace.  Using --recursive, one
-could put all tests under the root directory into a single namespace.
-Now each directory has a namespace associated with it.  Tests or
-suites with single names refer to items in the same namespace (that
-is, the same directory).  You may refer to the bar test or suite in
-the foo subdirectory as 
+   The dot is still used for namespace separation.  So looking up foo.bar
+   will first look for the namespace foo in the local namespace;  if this
+   exists, it will try to look up bar in that.  If foo is not a namespace
+   relavent to the current one, it will try to look up foo.bar in the
+   global namespace.
 
-foo.bar
+ * Added hierarchal namespaces to tests (jhammel)
 
-If a suite has the same name as the subdirectory name, you may refer
-to it either with the full specification
+   Formerly, tests lived in a flat namespace.  Using --recursive, one
+   could put all tests under the root directory into a single namespace.
+   Now each directory has a namespace associated with it.  Tests or
+   suites with single names refer to items in the same namespace (that
+   is, the same directory).  You may refer to the bar test or suite in
+   the foo subdirectory as 
 
-foo.foo
+   foo.bar
 
-or with shorthand
+   If a suite has the same name as the subdirectory name, you may refer
+   to it either with the full specification
 
-foo
+   foo.foo
 
-To refer to the global namespace, preface the name of the test, suite,
-or path with a dot
+   or with shorthand
 
-.foo.bar
+   foo
 
-refers to the bar suite or test under the foo directory under the root
-directory.  
+   To refer to the global namespace, preface the name of the test, suite,
+   or path with a dot
 
-These changes should be backwards compatible with existing tests and
-were made to facilitate test organization with the hope of providing
-the flexibility to manipulate namespaces when tests live in multiple
-locations on disc.
+   .foo.bar
+
+   refers to the bar suite or test under the foo directory under the root
+   directory.  
+
+   These changes should be backwards compatible with existing tests and
+   were made to facilitate test organization with the hope of providing
+   the flexibility to manipulate namespaces when tests live in multiple
+   locations on disc.
