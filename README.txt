@@ -79,5 +79,5 @@ More details are on the `Flunc homepage`_.
 
 .. _Twill: http://pypi.python.org/pypi/twill
 
-.. _`Flunc homepage`: http://www.openplans.org/projects/flunc
+.. _`Flunc homepage`: http://www.coactivate.org/projects/flunc
 
