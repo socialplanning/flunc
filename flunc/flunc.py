@@ -531,7 +531,9 @@ def main(argv=None):
 
     if options.global_defines:
         try:
-            CONFIG_OVERRIDE_DICT.update(eval('dict(%s)' % options.global_defines))
+            CONFIG_OVERRIDE_DICT.update(
+                dict([x.split('=') for x in options.global_defines.split(',')])
+                )
         except Exception, msg:
             die('Error parsing global definitions (%s): %s' % (options.global_defines, msg))
 
@@ -598,7 +600,7 @@ def get_optparser():
                       dest='config_file')
     parser.add_option('-D', '--define',
                       help="specifies configuration overrides as a comma separated list of name='value' pairs",
-                      dest='global_defines')                      
+                      dest='global_defines')
     parser.add_option('-l', '--list',
                       dest='list_suites',
                       action='store_true',
