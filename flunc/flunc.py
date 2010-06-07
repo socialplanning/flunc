@@ -42,9 +42,7 @@ class Namespace(object):
             base_namespace = self
 
         if not os.path.isdir(directory):
-            log_warn("Test directory not found (%s). Use -p to specify test search path" % directory)
-            # raise SomeThing
-            return
+            die("Test directory not found (%s). Use -p to specify test search path" % directory)
 
         self.base = base_namespace
         self.scan_for_tests()
