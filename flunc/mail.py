@@ -17,57 +17,41 @@ by the server.
 
 from twill.namespaces import get_twill_glocals
 from twill.errors import TwillAssertionError, TwillException
+from twill.commands import get_browser
 
-def send_mail(file):
-    file = '/tmp/testmail'
-    fp = open(file)
-    mailStr = fp.read()
-    fp.close()
+def clear_mail():
+    browser = get_browser()
+    browser.clear_cookies(name='debug-mail-location')
 
-    receiverURL = 'http://localhost:10001/openplans/send_listen_mail'
-
-    mails = send(receiverURL, mailStr)
-
-    globals, locals = get_twill_glocals()
-
+def get_mail():
+    browser = get_browser()
+    mails = None
+    for cookie in browser.cj:
+        if cookie.name != 'debug-mail-location': 
+            continue
+        mails = cookie.value
+        if mails.startswith('"'):
+            mails = mails.strip('"')
+        break
     if mails is None:
-        locals['__num_mails__'] = 0
-        return
-    
-    locals['__num_mails__'] = len(mails)
-    for i in range(len(mails)):
-        locals['__mail_%s__' % i] = mails[i] 
-    
-def mails_sent(num=None):
-    globals, locals = get_twill_glocals()
-    actual = locals.get('__num_mails__')
-    if actual is None:
-        raise TwillAssertionError("No mails sent by server!")
-    if num is None:
-        return
+        mails = []
+    else:
+        mails = mails.split(';')
+    return mails
+
+def num_mails(num):
     num = int(num)
-    if num != actual:
-        raise TwillAssertionError("Expected %s mails; got %s instead" % (num, actual))
+    if num != len(get_mail()):
+        raise TwillAssertionError("Expected %s mails; we have %s" % 
+                                  (num, len(get_mail())))
 
-def no_mails_sent():
-    globals, locals = get_twill_glocals()
-    actual = locals.get('__num_mails__')
-    if actual is not None:
-        raise TwillAssertionError("No mails should have been sent by server, but %s mails were sent!" % actual)
-
-def iter_mails():
-    globals, locals = get_twill_glocals()
-    actual = locals.get('__num_mails__', 0)
-    for i in range(actual):
-        yield locals['__mail_%s__' % i]
 
 from pprint import pformat
 import email
-def find_mail_from_header(header, value):
-    mails_sent()
-    globals, locals = get_twill_glocals()
+def select_mail_from_header(header, value):
     actuals = []
-    for mailpath in iter_mails():
+    _, locals = get_twill_glocals()
+    for mailpath in get_mail():
         fp = open(mailpath)
         msg = email.message_from_file(fp)
         fp.close()
@@ -78,16 +62,27 @@ def find_mail_from_header(header, value):
         actuals.append(actual)
     raise TwillAssertionError("No mail with header %s=%s was sent. Values were:\n%s" % (header, value, pformat(actuals)))
 
+def print_selected_mail():
+    mail = selected_mail()
+    fp = open(mail)
+    print fp.read()
+    fp.close()
+
 def selected_mail():
-    mails_sent()
     globals, locals = get_twill_glocals()
     mail = locals.get('__current_mail__')
     if mail is None:
         raise TwillException("No mail is currently selected.")
     return mail
 
+def unselect_mail():
+    globals, locals = get_twill_glocals()
+    mail = locals.get('__current_mail__')
+    if mail is None:
+        raise TwillException("No mail is currently selected.")
+    del locals['__current_mail__']
+
 def mail_has_header(header, value):
-    mails_sent()
     mail = selected_mail()
     fp = open(mail)
     msg = email.message_from_file(fp)
@@ -96,6 +91,38 @@ def mail_has_header(header, value):
     if actual != value:
         raise TwillAssertionError("In mail %s, expected header %s=%s; got %s" % (
                 mail, header, value, actual))
+
+def mail_contains(value):
+    mail = selected_mail()
+    fp = open(mail)
+    msg = email.message_from_file(fp)
+    fp.close()
+    body = msg.get_payload()
+    if value not in body:
+        raise TwillAssertionError("no match for <%s> in mail at %s" % (
+                value, mail))
+
+def send_mail(file):
+    fp = open(file)
+    mailStr = fp.read()
+    fp.close()
+
+    receiverURL = 'http://localhost:10001/openplans/send_listen_mail'
+
+    mails = send(receiverURL, mailStr)
+    if mails is None: 
+        return
+    from twill.browser import mechanize
+    cookie = mechanize.Cookie(None,
+                              'debug-mail-location',
+                              mails,
+                              None, False,
+                              '', False, False,
+                              '/', False,
+                              None, None, 
+                              None, None, None, None, None)
+    browser = get_browser()
+    browser.cj.set_cookie(cookie)
 
 """
  smtp2zope.py - Read a email from stdin and forward it to a url
@@ -587,7 +614,12 @@ def send(callURL, mailString, maxBytes=None):
 
     # All locks will be removed when Python cleans up!
 
-    mail = response.headers.get('X-Debug-Mail-Location')
+    mail = response.headers.get('Set-Cookie')
     if mail:
-        mail = mail.split(';')
-        return mail
+        from Cookie import BaseCookie
+        cookie = BaseCookie(mail)
+        try:
+            morsel = cookie['debug-mail-location']
+        except KeyError:
+            return
+        return morsel.value

@@ -87,7 +87,6 @@ def map_host_name(old_host):
     else:
         host, selector = host[:slash_pos], host[slash_pos:]
         return host, selector
-        
 
 def patch_browser():
     # patch the do_open method of the http handler class
