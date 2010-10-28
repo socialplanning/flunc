@@ -3,7 +3,7 @@ from twill.errors import TwillAssertionError
 
 import urllib
 
-def url_qs(what):
+def url_qs(what, val=None):
     browser = get_browser()
     qs = urllib.splitquery(browser.get_url())[-1]
     qs = qs.split('&')
@@ -15,3 +15,9 @@ def url_qs(what):
     if what not in qsdict:
         raise TwillAssertionError("no match to '%s' in %s" % (what, qs))
     
+    if val is None:
+        return
+
+    if qsdict[what] != val:
+        raise TwillAssertionError("Expected query_string argument %s to be %s, but it's %s instead" 
+                                  % (what, val, qsdict[what]))
