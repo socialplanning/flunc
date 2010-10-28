@@ -4,6 +4,8 @@
  * Better behavior for the error case where search path (-p option) 
    is nonexistent or not a directory (egj)
 
+ * Add optional second argument to `url_qs` command in flunc.urlinspector
+
 0.7 (2009-10-05)
 ================
 
