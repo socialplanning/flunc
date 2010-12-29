@@ -15,6 +15,38 @@ def wait():
     import pdb; pdb.set_trace()
 
 import os
+
+import email
+
+def reply(reply_text):
+    browser = get_browser()
+    html = browser.get_html()
+    mailStr = build_reply(reply_text, html)
+    send_mail_string(mailStr)
+
+def build_reply(reply_text, mailStr):
+    mail = email.message_from_string(mailStr)
+    body = mail.get_payload()
+    sender = mail['From']
+    recipient = mail['To']
+    subject = mail['Subject']
+
+    subject = 'Re: %s' % subject
+    from_ = recipient
+    to_ = sender
+    body = body.replace("\n", "\n>")
+    body = "%s\n\n>%s" % (reply_text, body)
+    return "From: %s\nTo: %s\nSubject: %s\n\n%s" % (from_, to_, subject, body)
+
+def send_mail_string(mailStr, base_url=None):
+    if base_url is None:
+        tglobals, tlocals = get_twill_glocals()
+        base_url = tglobals['base_url']
+
+    receiverURL = "%s/send_listen_mail" % base_url.rstrip("/")
+
+    send(receiverURL, mailStr)
+    
 def send_mail(dir, file, base_url):
     if not os.path.isabs(dir):
         tglobals, tlocals = get_twill_glocals()
@@ -26,9 +58,7 @@ def send_mail(dir, file, base_url):
     mailStr = fp.read()
     fp.close()
 
-    receiverURL = "%s/send_listen_mail" % base_url.rstrip("/")
-
-    send(receiverURL, mailStr)
+    send_mail_string(mailStr, base_url)
 
 """
  smtp2zope.py - Read a email from stdin and forward it to a url
