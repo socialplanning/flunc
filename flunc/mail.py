@@ -16,6 +16,11 @@ def wait():
 
 import os
 def send_mail(dir, file, base_url):
+    if not os.path.isabs(dir):
+        tglobals, tlocals = get_twill_glocals()
+        test_path = tglobals['test_path']
+        dir = os.path.join(test_path, dir)
+
     file = os.path.join(dir, file)
     fp = open(file)
     mailStr = fp.read()
