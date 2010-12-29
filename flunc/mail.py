@@ -12,6 +12,8 @@ from twill.commands import get_browser
 from twill.commands import go
 from logging import log_info
 
+from parser import substitute_vars
+
 def wait():
     import pdb; pdb.set_trace()
 
@@ -45,6 +47,11 @@ def send_mail_string(mailStr, base_url=None):
         base_url = tglobals['base_url']
 
     receiverURL = "%s/send_listen_mail" % base_url.rstrip("/")
+
+    tglobals, tlocals = get_twill_glocals()
+    ctx = tglobals.copy()
+    ctx.update(tlocals)
+    mailStr = substitute_vars(mailStr, ctx)
 
     send(receiverURL, mailStr)
     
