@@ -10,6 +10,7 @@ from twill.namespaces import get_twill_glocals
 from twill.errors import TwillAssertionError, TwillException
 from twill.commands import get_browser
 from twill.commands import go
+from logging import log_info
 
 def wait():
     import pdb; pdb.set_trace()
@@ -53,6 +54,7 @@ def send_mail(dir, file, base_url):
         test_path = tglobals['test_path']
         dir = os.path.join(test_path, dir)
 
+    log_info("sending email from file %s" % file)
     file = os.path.join(dir, file)
     fp = open(file)
     mailStr = fp.read()
