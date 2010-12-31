@@ -10,12 +10,12 @@ from twill.namespaces import get_twill_glocals
 from twill.errors import TwillAssertionError, TwillException
 from twill.commands import get_browser
 from twill.commands import go
-from logging import log_info
+from logging import log_warn
 
 from parser import substitute_vars
 
 def wait():
-    import pdb; pdb.set_trace()
+    import time; time.sleep(2)
 
 import os
 
@@ -59,6 +59,14 @@ def send_mail_string(mailStr, base_url=None):
     ctx.update(tlocals)
     mailStr = substitute_vars(mailStr, ctx)
 
+    mail = email.message_from_string(mailStr)
+    body = mail.get_payload()
+    sender = mail['From']
+    recipient = mail['To']
+    subject = mail['Subject']
+    log_warn("sending email: Subject: '%s'; From: '%s'; To: '%s'" % (
+            subject, sender, recipient))
+
     send(receiverURL, mailStr)
     
 def send_mail(dir, file, base_url):
@@ -67,7 +75,6 @@ def send_mail(dir, file, base_url):
         test_path = tglobals['test_path']
         dir = os.path.join(test_path, dir)
 
-    log_info("sending email from file %s" % file)
     file = os.path.join(dir, file)
     fp = open(file)
     mailStr = fp.read()
