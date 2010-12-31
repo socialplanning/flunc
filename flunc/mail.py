@@ -21,13 +21,19 @@ import os
 
 import email
 
+def reply_from(reply_text, from_):
+    browser = get_browser()
+    html = browser.get_html()
+    mailStr = build_reply(reply_text, html, from_)
+    send_mail_string(mailStr)
+
 def reply(reply_text):
     browser = get_browser()
     html = browser.get_html()
     mailStr = build_reply(reply_text, html)
     send_mail_string(mailStr)
 
-def build_reply(reply_text, mailStr):
+def build_reply(reply_text, mailStr, from_=None):
     mail = email.message_from_string(mailStr)
     body = mail.get_payload()
     sender = mail['From']
@@ -35,7 +41,7 @@ def build_reply(reply_text, mailStr):
     subject = mail['Subject']
 
     subject = 'Re: %s' % subject
-    from_ = recipient
+    from_ = from_ or recipient
     to_ = sender
     body = body.replace("\n", "\n>")
     body = "%s\n\n>%s" % (reply_text, body)
