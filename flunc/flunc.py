@@ -524,6 +524,7 @@ def main(argv=None):
         try: 
             global CONFIG_OVERRIDE_SCRIPT 
             CONFIG_OVERRIDE_SCRIPT = read_configuration(options.config_file)
+            log_info("Loaded global config overrides: %s" % options.config_file)
         except IOError, msg:
             die(msg)
 
