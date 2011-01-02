@@ -1,11 +1,40 @@
+from twill.commands import get_browser, go, find
 from twill.errors import TwillAssertionError
 from twill.namespaces import get_twill_glocals 
 from xmlrpclib import Server as XMLRPCServer 
 import urllib 
 
-from logging import log_warn
+import xpath
 
-__all__ = ['run_cat_queue', 'run_export_queue']
+from logging import log_warn
+import simplejson
+
+__all__ = ['run_cat_queue',
+           'run_export_queue', 'ensure_project_export']
+
+def ensure_project_export(admin_user, admin_pw, project):
+    """
+    Looks for a project export zipfile in the page.
+    (Expects to be already on the project's export view.)
+    If no export zipfile is found, trigger the export queue
+    processing on the remote server, and then check again.
+    """
+    globals, locals = get_twill_glocals()
+
+    base_url = globals.get('base_url')
+    url = "%s/projects/%s/export/current_status_json" % (
+        base_url, project)
+    go(url)
+    html = get_browser().get_html()
+    if "state" not in html:
+        run_export_queue(admin_user, admin_pw, project)
+    else:
+        json = simplejson.loads(html)
+        if json['state'] == "failed":
+            raise TwillAssertionError(
+                "Export failed: %s" % html)
+        if json['state'] != 'finished':
+            time.sleep(5)
 
 def run_export_queue(admin_user, admin_pw, expected=None):
     globals, locals = get_twill_glocals()
