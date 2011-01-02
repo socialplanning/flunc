@@ -1,3 +1,4 @@
+from twill.errors import TwillAssertionError
 from twill.namespaces import get_twill_glocals 
 from xmlrpclib import Server as XMLRPCServer 
 import urllib 
@@ -6,7 +7,7 @@ from logging import log_warn
 
 __all__ = ['run_cat_queue', 'run_export_queue']
 
-def run_export_queue(admin_user, admin_pw):
+def run_export_queue(admin_user, admin_pw, expected=None):
     globals, locals = get_twill_glocals()
 
     base_url = globals.get('base_url')
@@ -21,7 +22,10 @@ def run_export_queue(admin_user, admin_pw):
     auth_url = "%s://%s:%s@%s%s/" % (scheme, admin_user, admin_pw, host, path)
     portal = XMLRPCServer(auth_url)
 
-    portal.manage_project_export_queue()
+    # pass in a maxwait of 1 second to speed things up
+    exports = portal.manage_project_export_queue(1)
+    if expected is not None and expected not in exports:
+        raise TwillAssertionError("project id %s not found in exported projects: %r" % (expected, exports))
 
 def run_cat_queue(admin_user, admin_pw): 
     globals, locals = get_twill_glocals()
