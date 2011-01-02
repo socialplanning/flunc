@@ -1,13 +1,12 @@
+from logging import log_warn
+import simplejson
+import time
+import urllib 
 from twill.commands import get_browser, go, find
 from twill.errors import TwillAssertionError
 from twill.namespaces import get_twill_glocals 
 from xmlrpclib import Server as XMLRPCServer 
-import urllib 
 
-import xpath
-
-from logging import log_warn
-import simplejson
 
 __all__ = ['run_cat_queue',
            'run_export_queue', 'ensure_project_export']
