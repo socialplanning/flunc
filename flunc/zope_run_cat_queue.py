@@ -4,8 +4,24 @@ import urllib
 
 from logging import log_warn
 
-__all__ = ['run_cat_queue']
+__all__ = ['run_cat_queue', 'run_export_queue']
 
+def run_export_queue(admin_user, admin_pw):
+    globals, locals = get_twill_glocals()
+
+    base_url = globals.get('base_url')
+    prepath = globals.get('prepath')
+
+    log_warn("(zope) Running export queue for %s" % (base_url))
+
+    scheme, uri = urllib.splittype(base_url) 
+    host, path = urllib.splithost(uri)
+    if prepath is not None:
+        path = prepath + path
+    auth_url = "%s://%s:%s@%s%s/" % (scheme, admin_user, admin_pw, host, path)
+    portal = XMLRPCServer(auth_url)
+
+    portal.manage_project_export_queue()
 
 def run_cat_queue(admin_user, admin_pw): 
     globals, locals = get_twill_glocals()
