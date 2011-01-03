@@ -2,14 +2,43 @@ from logging import log_warn
 import simplejson
 import time
 import urllib 
-from twill.commands import get_browser, go, find
+from twill.commands import get_browser, go, find, save_html
 from twill.errors import TwillAssertionError
 from twill.namespaces import get_twill_glocals 
 from xmlrpclib import Server as XMLRPCServer 
-
+import zipfile
+from StringIO import StringIO
 
 __all__ = ['run_cat_queue',
-           'run_export_queue', 'ensure_project_export']
+           'run_export_queue', 'ensure_project_export', 
+           'download_project_export',
+           'export_contains', 'export_file_contains']
+
+def download_project_export():
+    url = get_browser().get_url()
+    assert url.endswith(".zip")
+    zipcontents = get_browser().get_html()
+    output = StringIO()
+    output.write(zipcontents)
+    z = zipfile.ZipFile(output, 'r')
+    globals, locals = get_twill_glocals()
+    globals['__project_export__'] = z
+
+def export_contains(filename):
+    globals, locals = get_twill_glocals()
+    z = globals['__project_export__']
+    if filename not in z.namelist():
+        raise TwillAssertionError("file %s not found in project export zipfile")
+
+def export_file_contains(filename, content):
+    globals, locals = get_twill_glocals()
+    z = globals['__project_export__']
+    if filename not in z.namelist():
+        raise TwillAssertionError("file %s not found in project export zipfile")
+    body = z.read(filename)
+    if content not in body:
+        raise TwillAssertionError("text '%s' not found in contents of file '%s': %s" % (
+                content, filename, body))
 
 def ensure_project_export(admin_user, admin_pw, project):
     """
