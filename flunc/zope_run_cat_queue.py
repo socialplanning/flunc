@@ -21,20 +21,23 @@ def download_project_export():
     output = StringIO()
     output.write(zipcontents)
     z = zipfile.ZipFile(output, 'r')
+    name = url.split('/')[-1]
     globals, locals = get_twill_glocals()
-    globals['__project_export__'] = z
+    globals['__project_export__'] = (z, name)
 
 def export_contains(filename):
     globals, locals = get_twill_glocals()
-    z = globals['__project_export__']
+    z, zipname = globals['__project_export__']
     if filename not in z.namelist():
         raise TwillAssertionError("file %s not found in project export zipfile")
 
 def export_file_contains(filename, content):
     globals, locals = get_twill_glocals()
-    z = globals['__project_export__']
+    z, zipname = globals['__project_export__']
     if filename not in z.namelist():
         raise TwillAssertionError("file %s not found in project export zipfile")
+    log_warn("inspecting contents of file '%s' in project export zipfile '%s' " % (
+            filename, zipname))
     body = z.read(filename)
     if content not in body:
         raise TwillAssertionError("text '%s' not found in contents of file '%s': %s" % (
