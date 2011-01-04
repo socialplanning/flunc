@@ -12,7 +12,17 @@ from StringIO import StringIO
 __all__ = ['run_cat_queue',
            'run_export_queue', 'ensure_project_export', 
            'download_project_export',
-           'export_contains', 'export_file_contains']
+           'export_contains', 'export_file_contains', 'inspect']
+
+def inspect(filename):
+    globals, locals = get_twill_glocals()
+    z, zipname = globals['__project_export__']
+    if filename not in z.namelist():
+        raise TwillAssertionError("file %s not found in project export zipfile")
+    log_warn("inspecting contents of file '%s' in project export zipfile '%s' " % (
+            filename, zipname))
+    body = z.read(filename)
+    import pdb; pdb.set_trace()
 
 def download_project_export():
     url = get_browser().get_url()
@@ -66,6 +76,7 @@ def ensure_project_export(admin_user, admin_pw, project):
                 "Export failed: %s" % html)
         if json['state'] != 'finished':
             time.sleep(5)
+            ensure_project_export(admin_user, admin_pw, project)
 
 def run_export_queue(admin_user, admin_pw, expected=None):
     globals, locals = get_twill_glocals()
