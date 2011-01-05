@@ -39,7 +39,7 @@ def export_contains(filename):
     globals, locals = get_twill_glocals()
     z, zipname = globals['__project_export__']
     if filename not in z.namelist():
-        raise TwillAssertionError("file %s not found in project export zipfile")
+        raise TwillAssertionError("file %s not found in project export zipfile" % filename)
 
 def export_file_contains(filename, content):
     globals, locals = get_twill_glocals()
