@@ -2,17 +2,23 @@ from logging import log_warn
 import simplejson
 import time
 import urllib 
-from twill.commands import get_browser, go, find, save_html
+from twill.commands import get_browser, go, find, save_html, fv
 from twill.errors import TwillAssertionError
 from twill.namespaces import get_twill_glocals 
 from xmlrpclib import Server as XMLRPCServer 
 import zipfile
 from StringIO import StringIO
 
-__all__ = ['run_cat_queue',
-           'run_export_queue', 'ensure_project_export', 
-           'download_project_export',
-           'export_contains', 'export_file_contains', 'inspect']
+import os
+def post_file(form, field, file):
+    globals, locals = get_twill_glocals()
+
+    test_path = globals.get('test_path')
+    file = os.path.join(test_path, file)
+    file = open(file)
+    body = file.read()
+    file.close()
+    fv(form, field, body)
 
 def inspect(filename):
     globals, locals = get_twill_glocals()
@@ -41,6 +47,18 @@ def export_contains(filename):
     if filename not in z.namelist():
         raise TwillAssertionError("file %s not found in project export zipfile" % filename)
 
+def not_export_file_contains(filename, content):
+    globals, locals = get_twill_glocals()
+    z, zipname = globals['__project_export__']
+    if filename not in z.namelist():
+        raise TwillAssertionError("file %s not found in project export zipfile")
+    log_warn("inspecting contents of file '%s' in project export zipfile '%s' " % (
+            filename, zipname))
+    body = z.read(filename)
+    if content in body:
+        raise TwillAssertionError("text '%s' was found in contents of file '%s': %s" % (
+                content, filename, body))
+    
 def export_file_contains(filename, content):
     globals, locals = get_twill_glocals()
     z, zipname = globals['__project_export__']
