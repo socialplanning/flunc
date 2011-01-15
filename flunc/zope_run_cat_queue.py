@@ -24,7 +24,7 @@ def inspect(filename):
     globals, locals = get_twill_glocals()
     z, zipname = globals['__project_export__']
     if filename not in z.namelist():
-        raise TwillAssertionError("file %s not found in project export zipfile")
+        raise TwillAssertionError("file %s not found in project export zipfile" % filename)
     log_warn("inspecting contents of file '%s' in project export zipfile '%s' " % (
             filename, zipname))
     body = z.read(filename)
@@ -51,7 +51,7 @@ def not_export_file_contains(filename, content):
     globals, locals = get_twill_glocals()
     z, zipname = globals['__project_export__']
     if filename not in z.namelist():
-        raise TwillAssertionError("file %s not found in project export zipfile")
+        raise TwillAssertionError("file %s not found in project export zipfile" % filename)
     log_warn("inspecting contents of file '%s' in project export zipfile '%s' " % (
             filename, zipname))
     body = z.read(filename)
@@ -63,7 +63,7 @@ def export_file_contains(filename, content):
     globals, locals = get_twill_glocals()
     z, zipname = globals['__project_export__']
     if filename not in z.namelist():
-        raise TwillAssertionError("file %s not found in project export zipfile")
+        raise TwillAssertionError("file %s not found in project export zipfile" % filename)
     log_warn("inspecting contents of file '%s' in project export zipfile '%s' " % (
             filename, zipname))
     body = z.read(filename)
