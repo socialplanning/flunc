@@ -17,7 +17,7 @@ Flunc tests are Twill_ scripts.
 There is a firefox extension that allows you to record tests directly
 from within your browser. To install, visit
 
- * http://developer.spikesource.com/wiki/index.php/Projects:TestGen4Web
+ * http://sourceforge.net/projects/testgen4web/
 
 These tests are saved in an xml format. You can convert these tests
 into a twill script by executing
