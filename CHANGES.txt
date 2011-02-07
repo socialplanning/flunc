@@ -6,6 +6,9 @@
 
  * Add optional second argument to `url_qs` command in flunc.urlinspector
 
+ * Add new command `css_len` in flunc.xpath which lets you test that 
+   a given CSS selector matches exactly N elements in the page (egj)
+
 0.7 (2009-10-05)
 ================
 
