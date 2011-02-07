@@ -9,7 +9,22 @@ import lxml.html
 import re
 from lxml.cssselect import CSSSelector
 
-__all__ = ['find_in_xpath', 'notfind_in_xpath', 'find_in_css', 'notfind_in_css']
+__all__ = ['find_in_xpath', 'notfind_in_xpath', 'find_in_css', 'notfind_in_css', 'css_len']
+
+def css_len(css, num):
+    num = int(num)
+
+    _, twill_locals = get_twill_glocals()
+    browser = get_browser()
+    html = browser.get_html()
+    tree = lxml.html.document_fromstring(html)
+    sel = CSSSelector(css)
+    results = sel(tree)
+    
+    actual_num = len(results)
+    if actual_num != num:
+        raise TwillAssertionError("Expected %s matches to \"%s\"; found %s" % (
+                num, css, actual_num))
 
 def find_in_css(what, css):
     _, twill_locals = get_twill_glocals()
