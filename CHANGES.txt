@@ -5,6 +5,8 @@
    is nonexistent or not a directory (egj)
 
  * Add optional second argument to `url_qs` command in flunc.urlinspector
+   which, if present, asserts the value of the given querystring parameter,
+   as well as asserting its presence. (egj)
 
  * Add new command `css_len` in flunc.xpath which lets you test that 
    a given CSS selector matches exactly N elements in the page (egj)
